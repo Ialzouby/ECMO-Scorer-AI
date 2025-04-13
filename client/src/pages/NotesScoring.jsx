@@ -7,7 +7,7 @@ export default function NotesScoring() {
   const [result, setResult] = useState("");
 
   const handleSubmit = async () => {
-    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/api/ecmo-score`, {
+    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/ecmo-score`, {
       mode: "notes",
       data: { history, exam }
     });

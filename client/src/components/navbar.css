@@ -1,0 +1,21 @@
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    z-index: 1000; /* Ensures the navbar stays above other elements */
+}
+
+nav a {
+    margin-right: 1rem;
+    text-decoration: none;
+    color: #007bff;
+}
+
+nav a:first-child {
+    font-weight: bold;
+}

@@ -7,24 +7,19 @@ const ecmoRoute = require('./routes/ecmo');
 
 const app = express();
 
-// ✅ Middleware
+// ✅ Put CORS at the very top
 app.use(cors({
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost")) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
-  }));
-  
-app.use(express.json());
+  origin: '*', // 🔥 TEMPORARILY allow all during development
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
 
-// ✅ Route
+// ✅ Handle OPTIONS requests globally
+app.options('*', cors());
+
+app.use(express.json());
 app.use('/api/ecmo-score', ecmoRoute);
 
-app.listen(5000, () => {
-  console.log('✅ Backend running on http://localhost:5000');
+app.listen(5050, () => {
+  console.log('✅ Backend running at http://localhost:5050');
 });

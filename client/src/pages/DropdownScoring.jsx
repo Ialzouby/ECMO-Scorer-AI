@@ -20,7 +20,7 @@ export default function DropdownScoring() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/ecmo-score", {
+      const res = await axios.post("http://localhost:5050/api/ecmo-score", {
         mode: "dropdown",
         data: form,
       });

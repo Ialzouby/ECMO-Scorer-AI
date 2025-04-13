@@ -14,7 +14,7 @@ export default function NotesScoring() {
     setResult("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/ecmo-score", {
+      const res = await axios.post("http://localhost:5050/api/ecmo-score", {
         mode: "notes",
         data: { history, exam }
       });

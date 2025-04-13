@@ -7,7 +7,14 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 router.post('/', async (req, res) => {
   const { mode, data } = req.body;
 
+  console.log(`🔥 /api/ecmo-score POST hit with mode=${mode}`);
+
+  if (!mode || !data) {
+    return res.status(400).json({ error: "Missing mode or data" });
+  }
+
   let prompt;
+
   if (mode === 'dropdown') {
     prompt = `
 You are a clinical assistant evaluating ECMO timing for thoracic surgery in SVC syndrome.
@@ -47,7 +54,7 @@ Please:
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o', // ✅ Your model here
       messages: [
         { role: "system", content: "You are a clinical reasoning assistant for ECMO scoring." },
         { role: "user", content: prompt }

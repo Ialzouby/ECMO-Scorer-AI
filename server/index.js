@@ -7,33 +7,32 @@ const ecmoRoute = require('./routes/ecmo');
 
 const app = express();
 
-// ✅ Put CORS at the very top
+// ✅ CORS Setup (Temporary: allow everything during dev)
 app.use(cors({
-  origin: '*', // 🔥 TEMPORARILY allow all during development
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));
-
-// ✅ Handle OPTIONS requests globally
 app.options('*', cors());
 
 app.use(express.json());
+
+// ✅ Route Setup
 app.use('/api/ecmo-score', ecmoRoute);
 
-const PORT = process.env.PORT || 8080;
-
+// ✅ Health Check
 app.get('/', (req, res) => {
-    res.send('✅ ECMO backend is alive and well.');
-  });
-  
+  res.send('✅ ECMO backend is alive and well.');
+});
 
+// ✅ Catch-all for 405s (log unrecognized requests)
 app.all('*', (req, res) => {
   console.log(`🚫 Method not allowed: ${req.method} on ${req.originalUrl}`);
   res.status(405).send(`🚫 Method Not Allowed: ${req.method} on ${req.originalUrl}`);
 });
 
-
+// ✅ Port for both local and Railway
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
 });
-

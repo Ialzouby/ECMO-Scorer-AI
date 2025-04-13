@@ -20,7 +20,7 @@ app.options('*', cors());
 app.use(express.json());
 app.use('/api/ecmo-score', ecmoRoute);
 
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 8080;
 
 app.get('/', (req, res) => {
     res.send('✅ ECMO backend is alive and well.');

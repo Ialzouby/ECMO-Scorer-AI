@@ -20,6 +20,9 @@ app.options('*', cors());
 app.use(express.json());
 app.use('/api/ecmo-score', ecmoRoute);
 
-app.listen(5050, () => {
-  console.log('✅ Backend running at http://localhost:5050');
+const PORT = process.env.PORT || 5050;
+
+app.listen(PORT, () => {
+  console.log(`✅ Backend running on port ${PORT}`);
 });
+

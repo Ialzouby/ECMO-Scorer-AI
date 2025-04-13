@@ -22,6 +22,11 @@ app.use('/api/ecmo-score', ecmoRoute);
 
 const PORT = process.env.PORT || 5050;
 
+app.get('/', (req, res) => {
+    res.send('✅ ECMO backend is alive and well.');
+  });
+  
+
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
 });

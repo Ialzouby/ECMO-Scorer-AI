@@ -7,14 +7,22 @@ const ecmoRoute = require('./routes/ecmo');
 
 const app = express();
 
-// ✅ CORRECT AND SAFE LOCAL DEV CORS SETUP
+// ✅ Middleware
 app.use(cors({
-  origin: 'http://localhost:5174',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-}));
-
+    origin: (origin, callback) => {
+      if (!origin || origin.startsWith("http://localhost")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+  }));
+  
 app.use(express.json());
+
+// ✅ Route
 app.use('/api/ecmo-score', ecmoRoute);
 
 app.listen(5000, () => {

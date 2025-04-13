@@ -27,6 +27,12 @@ app.get('/', (req, res) => {
   });
   
 
+app.all('*', (req, res) => {
+  console.log(`🚫 Method not allowed: ${req.method} on ${req.originalUrl}`);
+  res.status(405).send(`🚫 Method Not Allowed: ${req.method} on ${req.originalUrl}`);
+});
+
+
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
 });

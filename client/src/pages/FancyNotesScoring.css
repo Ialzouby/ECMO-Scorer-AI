@@ -1,0 +1,11 @@
+.textarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Adds spacing between the text areas and the divider */
+}
+
+.divider {
+  height: 1px;
+  background-color: #ddd; /* Light gray color for the divider */
+  margin: 0.5rem 0; /* Adds spacing around the divider */
+}

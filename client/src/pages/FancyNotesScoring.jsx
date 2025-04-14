@@ -35,7 +35,7 @@ export default function FancyNotesScoring() {
     <PageContainer>
       <CenteredContainer>
         <div>
-          <Title text="ECMO SVC Score - Artifical Intelligence (ESS-AI)" />
+          <Title text="ECMO SVC Score - Artificial Intelligence (ESS-AI)" />
 
           <div className="textarea-container">
             <label className="block mb-2 font-bold text-gray-700">

@@ -5,10 +5,10 @@ import './navbar.css';
 function Navbar() {
     return (
         <nav>
-        <Link to="/">ECMO Scorer</Link>
-        <Link to="/ecmo/dropdown">Dropdown Scoring</Link>
-        <Link to="/ecmo/notes">Notes Scoring</Link>
-        <Link to="/ecmo/fancy-notes">Fancy Notes Scoring</Link>
+        {/* <Link to="/">ESS-AI</Link> */}
+        {/* <Link to="/ecmo/dropdown">Dropdown Scoring</Link>
+        <Link to="/ecmo/notes">Notes Scoring</Link> */}
+        <Link to="/ecmo/fancy-notes">ESS-AI</Link>
       </nav>
     );
   }

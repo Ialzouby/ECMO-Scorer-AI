@@ -63,11 +63,18 @@ export default function FancyNotesScoring() {
               onClick={() => {
                 setHistory(sampleHistory);
                 setExam(sampleExam);
+              }}
+              className="blue-button ml-2"
+            >
+              Sample Input
+            </button>
+            <button
+              onClick={() => {
                 setResult(sampleResult);
               }}
               className="blue-button ml-2"
             >
-              Sample Response
+              Sample Output
             </button>
           </div>
 

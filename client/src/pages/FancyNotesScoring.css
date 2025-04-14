@@ -15,7 +15,7 @@ textarea {
 }
 
 .green-button {
-  background-color: #28a745; /* Green color */
+  background-color: #28a745; /* Green */
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
@@ -24,5 +24,27 @@ textarea {
 }
 
 .green-button:hover {
-  background-color: #218838; /* Darker green on hover */
+  background-color: #218838; /* Darker green */
+}
+
+.blue-button {
+  background-color: #007bff; /* Blue */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+}
+
+.blue-button:hover {
+  background-color: #0056b3; /* Darker blue */
+}
+
+.blue-button.ml-2 {
+  margin-left: 0.5rem; /* Adds left margin for spacing */
+}
+
+.button-container {
+  display: flex;
+  gap: 0.5rem; /* Adds spacing between buttons */
 }

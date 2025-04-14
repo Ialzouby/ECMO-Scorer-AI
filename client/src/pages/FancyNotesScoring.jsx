@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown"; // Import react-markdown
 import PageContainer from "../components/PageContainer";
 import CenteredContainer from "../components/CenteredContainer";
 import Title from "../components/Title";
@@ -54,7 +55,11 @@ export default function FancyNotesScoring() {
             Analyze
           </button>
 
-          {result && <div className="mt-6 p-4 border rounded bg-gray-100 whitespace-pre-wrap">{result}</div>}
+          {result && (
+            <div className="mt-6 p-4 border rounded bg-gray-100 whitespace-pre-wrap">
+              <ReactMarkdown>{result}</ReactMarkdown>
+            </div>
+          )}
         </div>
       </CenteredContainer>
     </PageContainer>

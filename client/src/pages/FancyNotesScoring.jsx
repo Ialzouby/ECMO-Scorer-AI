@@ -25,26 +25,32 @@ export default function FancyNotesScoring() {
           <Title text="ECMO Score (Note Analysis)" />
 
           <div className="textarea-container">
-            <textarea
-              placeholder="Paste History section"
-              value={history}
-              onChange={(e) => setHistory(e.target.value)}
-              className="w-full p-2 border rounded mb-3"
-              rows={6}
-              cols={80}
-            />
+            <label className="block mb-2 font-bold text-gray-700">
+              Patient History
+              <textarea
+                placeholder="what is the patient's history like?"
+                value={history}
+                onChange={(e) => setHistory(e.target.value)}
+                className="w-full p-2 border rounded mb-3"
+                rows={6}
+                cols={80}
+              />
+            </label>
             <div className="divider"></div>
-            <textarea
-              placeholder="Paste Physical Exam section"
-              value={exam}
-              onChange={(e) => setExam(e.target.value)}
-              className="w-full p-2 border rounded mb-3"
-              rows={6}
-              cols={80}
-            />
+            <label className="block mb-2 font-bold text-gray-700">
+              Physical Exam
+              <textarea
+                placeholder="Patient's Physical Exam results "
+                value={exam}
+                onChange={(e) => setExam(e.target.value)}
+                className="w-full p-2 border rounded mb-3"
+                rows={6}
+                cols={80}
+              />
+            </label>
           </div>
           <div className="divider"></div>
-          <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">
+          <button onClick={handleSubmit} className="green-button">
             Analyze
           </button>
 

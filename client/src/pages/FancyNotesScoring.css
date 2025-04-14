@@ -9,3 +9,20 @@
   background-color: #ddd; /* Light gray color for the divider */
   margin: 0.5rem 0; /* Adds spacing around the divider */
 }
+
+textarea {
+  resize: none; /* Disables resizing */
+}
+
+.green-button {
+  background-color: #28a745; /* Green color */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+}
+
+.green-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}

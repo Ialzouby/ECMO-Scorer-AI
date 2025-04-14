@@ -10,13 +10,21 @@ export default function FancyNotesScoring() {
   const [history, setHistory] = useState("");
   const [exam, setExam] = useState("");
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState("");
 
   const handleSubmit = async () => {
-    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/ecmo-score`, {
-      mode: "notes",
-      data: { history, exam },
-    });
-    setResult(res.data.response);
+    setLoading(true); // Start loading
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/ecmo-score`, {
+        mode: "notes",
+        data: { history, exam },
+      });
+      setResult(res.data.response);
+    } catch (error) {
+      console.error("Error fetching result:", error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   const sampleHistory = "patient presents with shortness of breath and swelling in the face."
@@ -27,7 +35,7 @@ export default function FancyNotesScoring() {
     <PageContainer>
       <CenteredContainer>
         <div>
-          <Title text="ECMO Score (Note Analysis)" />
+          <Title text="ECMO SVC Score - Artifical Intelligence (ESS-AI)" />
 
           <div className="textarea-container">
             <label className="block mb-2 font-bold text-gray-700">
@@ -77,6 +85,12 @@ export default function FancyNotesScoring() {
               Sample Output
             </button>
           </div>
+
+          {loading && (
+            <div className="spinner-container">
+              <div className="spinner"></div>
+            </div>
+          )}
 
           {result && (
             <div className="mt-6 p-4 border rounded bg-gray-100 whitespace-pre-wrap">

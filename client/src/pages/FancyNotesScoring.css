@@ -52,3 +52,28 @@ textarea::placeholder {
   display: flex;
   gap: 0.5rem; /* Adds spacing between buttons */
 }
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3; /* Light gray */
+  border-top: 4px solid #007bff; /* Blue */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

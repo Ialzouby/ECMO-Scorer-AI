@@ -59,7 +59,7 @@ export default function FancyNotesScoring() {
             <label className="block mb-2 font-bold text-gray-700">
               Physical Exam
               <textarea
-                placeholder="Patient's Physical Exam results "
+                placeholder="Patient's Physical Exam results"
                 value={exam}
                 onChange={(e) => setExam(e.target.value)}
                 className="w-full p-2 border rounded mb-3"
@@ -71,7 +71,7 @@ export default function FancyNotesScoring() {
           <div className="divider"></div>
           <div className="button-container">
             <button onClick={handleSubmit} className="green-button">
-              Analyze
+              Generate Recommendation
             </button>
             <button
               onClick={() => {

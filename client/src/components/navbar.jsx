@@ -4,10 +4,7 @@ import './navbar.css';
 
 function Navbar() {
     return (
-        <nav>
-        {/* <Link to="/">ESS-AI</Link> */}
-        {/* <Link to="/ecmo/dropdown">Dropdown Scoring</Link>
-        <Link to="/ecmo/notes">Notes Scoring</Link> */}
+      <nav>
         <Link to="/ecmo/fancy-notes">ESS-AI</Link>
       </nav>
     );

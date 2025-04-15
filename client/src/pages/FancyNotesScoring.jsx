@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown"; // Import react-markdown
+import covenantLogo from "../assets/images/covenant.png";
+import uncLogo from "../assets/images/unc.jpeg";
 import PageContainer from "../components/PageContainer";
 import CenteredContainer from "../components/CenteredContainer";
 import Title from "../components/Title";
@@ -35,6 +37,10 @@ export default function FancyNotesScoring() {
     <PageContainer>
       <CenteredContainer>
         <div>
+          <div className="image-container">
+            <img src={covenantLogo} alt="Covenant Logo" className="logo-image" />
+            <img src={uncLogo} alt="UNC Logo" className="logo-image" />
+          </div>
           <Title text="ECMO SVC Score - Artificial Intelligence (ESS-AI)" />
 
           <div className="textarea-container">

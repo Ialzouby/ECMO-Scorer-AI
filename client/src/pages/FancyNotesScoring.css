@@ -77,3 +77,15 @@ textarea::placeholder {
     transform: rotate(360deg);
   }
 }
+
+.image-container {
+  display: flex;
+  align-items: center; /* Align the images vertically */
+  gap: 1rem; /* Add spacing between the images */
+  margin-bottom: 1rem; /* Add spacing below the image container */
+}
+
+.logo-image {
+  height: 110px; /* Set the height of the images */
+  object-fit: contain; /* Maintain the aspect ratio */
+}

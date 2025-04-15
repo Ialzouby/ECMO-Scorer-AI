@@ -1,0 +1,4 @@
+.page-container {
+  min-height: 100vh; /* Ensure it covers the full viewport height */
+  padding: 2rem; /* Optional: Add padding */
+}

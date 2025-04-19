@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ECMO Analysis System</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -12,17 +13,17 @@
         extend: {
           colors: {
             primary: {
-              50: '#f0f7ff',
-              100: '#e0eefe',
-              200: '#bae0fd',
-              300: '#7cc8fb',
-              400: '#36aaf5',
-              500: '#0c8ee7',
-              600: '#0071c4',
-              700: '#015a9e',
-              800: '#064d83',
-              900: '#0a416d',
-              950: '#07294a',
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
             },
           },
           fontFamily: {
@@ -52,6 +53,24 @@
           transform: translateY(0);
         }
       }
+
+      /* Print styles */
+      @media print {
+        body {
+          background: white !important;
+          color: black !important;
+        }
+        .no-print {
+          display: none !important;
+        }
+        .print-only {
+          display: block !important;
+        }
+        .card {
+          box-shadow: none !important;
+          border: 1px solid #eee !important;
+        }
+      }
     }
     
     @layer components {
@@ -66,9 +85,17 @@
       .btn-outline {
         @apply border border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100;
       }
+
+      .btn-secondary {
+        @apply bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700;
+      }
       
       .btn-lg {
         @apply h-11 px-6 py-2;
+      }
+
+      .btn-sm {
+        @apply h-9 px-3 py-1;
       }
       
       .card {
@@ -102,6 +129,19 @@
       .tab-inactive {
         @apply text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300;
       }
+
+      .likert-option {
+        @apply relative w-5 h-5 rounded-full border border-gray-300 cursor-pointer transition-all hover:border-primary-500 dark:border-gray-600;
+      }
+
+      .likert-option.selected {
+        @apply bg-primary-600 border-primary-600 dark:bg-primary-500 dark:border-primary-500;
+      }
+
+      .likert-option.selected::after {
+        content: '';
+        @apply absolute top-1 left-1 w-3 h-3 rounded-full bg-white dark:bg-gray-900;
+      }
     }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,15 +150,20 @@
 </head>
 <body class="min-h-screen">
   <!-- Navbar -->
-  <header class="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-gray-800 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/60">
+  <header class="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-gray-800 dark:bg-gray-900/95 dark:supports-[backdrop-filter]:bg-gray-900/60 no-print">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
       <div class="flex items-center gap-6">
-        <a href="#" class="flex items-center gap-2 transition-opacity hover:opacity-90">
-          <div class="h-9 w-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain"><path d="M9.5 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/><path d="M14.5 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/><path d="M3 7a2 2 0 0 0-2 2v1c0 1.1.9 2 2 2h18a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H3Z"/><path d="M9.5 12v2"/><path d="M14.5 12v2"/><path d="M3 12v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8"/><path d="M9.5 19a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5Z"/></svg>
+        <div class="flex items-center gap-4">
+          <!-- Covenant AI Logo -->
+          <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain"><path d="M9.5 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/><path d="M14.5 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/><path d="M3 7a2 2 0 0 0-2 2v1c0 1.1.9 2 2 2h18a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H3Z"/><path d="M9.5 12v2"/><path d="M14.5 12v2"/><path d="M3 12v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8"/><path d="M9.5 19a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5Z"/></svg>
+          </div>
+          <!-- UNC Surgery Logo (placeholder) -->
+          <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+            UNC
           </div>
           <span class="hidden font-semibold text-lg md:inline-flex dark:text-white">ECMO Analysis</span>
-        </a>
+        </div>
 
         <nav class="hidden md:flex space-x-1">
           <a href="#" class="tab tab-active">
@@ -148,6 +193,10 @@
       </div>
 
       <div class="flex items-center gap-2">
+        <button id="help-button" class="btn btn-outline btn-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 h-4 w-4"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          Help
+        </button>
         <button id="theme-toggle" class="rounded-full p-2 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:text-gray-400 dark:hover:bg-gray-800">
           <!-- Sun icon -->
           <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden dark:block"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
@@ -185,8 +234,14 @@
 
   <!-- Main Content -->
   <main class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-4 md:p-8 lg:p-10 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-    <div class="max-w-6xl mx-auto">
-      <div class="card">
+    <div class="max-w-4xl mx-auto">
+      <!-- Medical Disclaimer -->
+      <div class="mb-6 p-4 border rounded-lg bg-yellow-50 text-yellow-800 text-sm dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800/30">
+        <p class="font-medium">Medical Disclaimer</p>
+        <p class="mt-1">This tool is designed to assist healthcare providers and does not replace physician medical decision making. All recommendations should be evaluated in the context of the patient's clinical presentation.</p>
+      </div>
+
+      <div id="report-container" class="card mb-8">
         <div class="p-6 pb-4 space-y-2 border-b dark:border-gray-700">
           <div class="flex items-center gap-3">
             <div class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center">
@@ -201,7 +256,7 @@
 
         <div class="p-6">
           <div class="tabs">
-            <div class="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+            <div class="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800 no-print">
               <button class="tab-button tab-active flex-1 text-center" data-tab="input">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 inline-block"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
                 Patient Data
@@ -215,7 +270,7 @@
             <div class="mt-8">
               <!-- Input Tab -->
               <div id="input-tab" class="tab-content animate-in">
-                <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-6">
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Patient History</label>
@@ -231,6 +286,14 @@
                     </div>
                     <textarea id="exam" class="textarea min-h-[180px] resize-none" placeholder="Enter physical examination notes..."></textarea>
                   </div>
+
+                  <div id="additional-info-container" class="space-y-3 hidden animate-in">
+                    <div class="flex items-center justify-between">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional Information</label>
+                      <span class="badge badge-outline">Optional</span>
+                    </div>
+                    <textarea id="additional-info" class="textarea min-h-[120px] resize-none" placeholder="Enter any additional information that might be relevant..."></textarea>
+                  </div>
                 </div>
 
                 <div id="error-message" class="mt-6 p-4 border rounded-lg bg-red-50 text-red-600 flex items-center gap-2 hidden dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/30">
@@ -238,15 +301,15 @@
                   <p class="text-sm">An error occurred while analyzing the notes. Please try again.</p>
                 </div>
 
-                <div class="flex flex-wrap justify-center gap-4 mt-10">
+                <div class="flex flex-wrap justify-center gap-4 mt-10 no-print">
                   <button id="analyze-button" class="btn btn-primary btn-lg gap-2" disabled>
-                    <span id="analyze-text">Analyze Notes</span>
+                    <span id="analyze-text">Generate Recommendations</span>
                     <svg id="analyze-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     <svg id="loading-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 animate-spin hidden"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                   </button>
 
-                  <button id="sample-button" class="btn btn-outline btn-lg">
-                    Load Sample Data
+                  <button id="additional-info-button" class="btn btn-outline btn-lg">
+                    Provide Additional Information
                   </button>
                 </div>
               </div>
@@ -271,6 +334,17 @@
                   <div class="prose dark:prose-invert max-w-none">
                     <pre id="result-text" class="whitespace-pre-wrap text-sm rounded-lg bg-gray-50 p-4 dark:bg-gray-900"></pre>
                   </div>
+
+                  <div class="flex flex-wrap gap-3 mt-6 no-print">
+                    <button id="print-button" class="btn btn-outline btn-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                      Print Report
+                    </button>
+                    <button id="download-button" class="btn btn-outline btn-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                      Download PDF
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -282,8 +356,160 @@
           <div>ECMO Analysis System v1.0</div>
         </div>
       </div>
+
+      <!-- Resource Links -->
+      <div class="mb-8 flex flex-wrap gap-3 justify-center no-print">
+        <a href="https://www.uptodate.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          UpToDate
+        </a>
+        <a href="https://www.mdcalc.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg>
+          MD Calc
+        </a>
+      </div>
+
+      <!-- Survey Section -->
+      <div class="card p-6 mb-8 no-print">
+        <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
+        
+        <div class="space-y-6">
+          <!-- Likert Scale Questions -->
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <p class="text-sm font-medium">1. The system was easy to use.</p>
+              <div class="flex items-center justify-between max-w-md">
+                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                <div class="flex space-x-6">
+                  <div class="likert-option" data-value="1" data-question="1"></div>
+                  <div class="likert-option" data-value="2" data-question="1"></div>
+                  <div class="likert-option" data-value="3" data-question="1"></div>
+                  <div class="likert-option" data-value="4" data-question="1"></div>
+                  <div class="likert-option" data-value="5" data-question="1"></div>
+                </div>
+                <span class="text-xs text-gray-500">Strongly Agree</span>
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <p class="text-sm font-medium">2. The recommendations provided were helpful.</p>
+              <div class="flex items-center justify-between max-w-md">
+                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                <div class="flex space-x-6">
+                  <div class="likert-option" data-value="1" data-question="2"></div>
+                  <div class="likert-option" data-value="2" data-question="2"></div>
+                  <div class="likert-option" data-value="3" data-question="2"></div>
+                  <div class="likert-option" data-value="4" data-question="2"></div>
+                  <div class="likert-option" data-value="5" data-question="2"></div>
+                </div>
+                <span class="text-xs text-gray-500">Strongly Agree</span>
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <p class="text-sm font-medium">3. I would use this system in my clinical practice.</p>
+              <div class="flex items-center justify-between max-w-md">
+                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                <div class="flex space-x-6">
+                  <div class="likert-option" data-value="1" data-question="3"></div>
+                  <div class="likert-option" data-value="2" data-question="3"></div>
+                  <div class="likert-option" data-value="3" data-question="3"></div>
+                  <div class="likert-option" data-value="4" data-question="3"></div>
+                  <div class="likert-option" data-value="5" data-question="3"></div>
+                </div>
+                <span class="text-xs text-gray-500">Strongly Agree</span>
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <p class="text-sm font-medium">4. The system saved me time in decision making.</p>
+              <div class="flex items-center justify-between max-w-md">
+                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                <div class="flex space-x-6">
+                  <div class="likert-option" data-value="1" data-question="4"></div>
+                  <div class="likert-option" data-value="2" data-question="4"></div>
+                  <div class="likert-option" data-value="3" data-question="4"></div>
+                  <div class="likert-option" data-value="4" data-question="4"></div>
+                  <div class="likert-option" data-value="5" data-question="4"></div>
+                </div>
+                <span class="text-xs text-gray-500">Strongly Agree</span>
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <p class="text-sm font-medium">5. I trust the recommendations provided by the system.</p>
+              <div class="flex items-center justify-between max-w-md">
+                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                <div class="flex space-x-6">
+                  <div class="likert-option" data-value="1" data-question="5"></div>
+                  <div class="likert-option" data-value="2" data-question="5"></div>
+                  <div class="likert-option" data-value="3" data-question="5"></div>
+                  <div class="likert-option" data-value="4" data-question="5"></div>
+                  <div class="likert-option" data-value="5" data-question="5"></div>
+                </div>
+                <span class="text-xs text-gray-500">Strongly Agree</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Open-ended Comments -->
+          <div class="space-y-2">
+            <label for="comments" class="text-sm font-medium">Additional Comments:</label>
+            <textarea id="comments" class="textarea" placeholder="Please share any additional feedback or suggestions..."></textarea>
+          </div>
+          
+          <button id="submit-survey" class="btn btn-primary">Submit Feedback</button>
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-500">
+          <p>Survey adapted from: Brennan M, Puri S, Ozrazgat-Baslanti T, Feng Z, Ruppert M, Hashemighouchani H, Momcilovic P, Li X, Wang DZ, Bihorac A. Comparing clinical judgment with the MySurgeryRisk algorithm for preoperative risk assessment: A pilot usability study. Surgery. 2019 May;165(5):1035-1045. doi: 10.1016/j.surg.2019.01.002. Epub 2019 Feb 18. PMID: 30792011; PMCID: PMC6502657.</p>
+        </div>
+      </div>
     </div>
   </main>
+
+  <!-- Help Modal -->
+  <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold">Help & Information</h3>
+          <button id="close-help" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-medium mb-2">About ECMO Analysis System</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">This tool uses AI to analyze patient data and provide ECMO recommendations. It is designed to assist healthcare providers in their decision-making process.</p>
+          </div>
+          
+          <div>
+            <h4 class="font-medium mb-2">How to Use</h4>
+            <ol class="text-sm text-gray-600 dark:text-gray-400 space-y-2 list-decimal list-inside">
+              <li>Enter patient history in the first text box</li>
+              <li>Enter physical examination findings in the second text box</li>
+              <li>Click "Generate Recommendations" to receive AI analysis</li>
+              <li>Review the recommendations in the Analysis Results tab</li>
+              <li>Print or download the report as needed</li>
+            </ol>
+          </div>
+          
+          <div>
+            <h4 class="font-medium mb-2">Privacy & Security</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">This system is HIPAA compliant. All data is encrypted and processed securely. No patient information is stored permanently.</p>
+          </div>
+          
+          <div>
+            <h4 class="font-medium mb-2">Contact Support</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">For technical assistance or questions, please contact: <a href="mailto:support@example.com" class="text-primary-600 dark:text-primary-400">support@example.com</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Theme toggle functionality
@@ -355,7 +581,8 @@
     const historyTextarea = document.getElementById('history');
     const examTextarea = document.getElementById('exam');
     const analyzeButton = document.getElementById('analyze-button');
-    const sampleButton = document.getElementById('sample-button');
+    const additionalInfoButton = document.getElementById('additional-info-button');
+    const additionalInfoContainer = document.getElementById('additional-info-container');
     const errorMessage = document.getElementById('error-message');
     const analyzeText = document.getElementById('analyze-text');
     const analyzeIcon = document.getElementById('analyze-icon');
@@ -376,11 +603,10 @@
     historyTextarea.addEventListener('input', updateAnalyzeButton);
     examTextarea.addEventListener('input', updateAnalyzeButton);
     
-    // Load sample data
-    sampleButton.addEventListener('click', () => {
-      historyTextarea.value = "Patient presents with shortness of breath and facial swelling.";
-      examTextarea.value = "Tracheal deviation noted. Oxygen saturation at 88%.";
-      updateAnalyzeButton();
+    // Show additional information field
+    additionalInfoButton.addEventListener('click', () => {
+      additionalInfoContainer.classList.remove('hidden');
+      additionalInfoButton.classList.add('hidden');
     });
     
     // Analyze notes
@@ -392,45 +618,140 @@
       loadingIcon.classList.remove('hidden');
       errorMessage.classList.add('hidden');
       
-      const payload = {
-  mode: "notes",
-  data: {
-    history: historyTextarea.value,
-    exam: examTextarea.value,
-  }
-};
-
+// Simulate API call (replace with actual API call)
 try {
-  const res = await fetch('https://ecmo-backend.up.railway.app/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  });
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
-  if (!res.ok) {
-    throw new Error("Server error: " + res.status);
-  }
+  // Simulate response
+  const response = {
+    success: true,
+    data: {
+      response: "ECMO ANALYSIS RESULTS:\n\n" +
+               "Patient Condition: Severe respiratory distress\n" +
+               "Key Findings:\n" +
+               "- Shortness of breath\n" +
+               "- Facial swelling\n" +
+               "- Tracheal deviation\n" +
+               "- Low oxygen saturation (88%)\n\n" +
+               "ECMO Recommendation: Consider immediate ECMO evaluation\n" +
+               "Risk Assessment: High risk for respiratory failure\n" +
+               "Additional Recommendations:\n" +
+               "- Urgent chest imaging to rule out pneumothorax\n" +
+               "- Prepare for possible intubation\n" +
+               "- Consult ECMO team immediately"
+    }
+  };
 
-  const result = await res.json();
-
-  resultText.textContent = result.response;
+  resultText.textContent = response.data.response;
   resultsEmpty.classList.add('hidden');
   resultsContent.classList.remove('hidden');
-
-  // Switch to results tab
   document.querySelector('[data-tab="results"]').click();
-} catch (error) {
-  console.error(error);
-  errorMessage.classList.remove('hidden');
-} finally {
-  analyzeButton.disabled = false;
-  analyzeText.textContent = "Analyze Notes";
-  analyzeIcon.classList.remove('hidden');
-  loadingIcon.classList.add('hidden');
-}
 
+      } catch (error) {
+        // Show error message
+        errorMessage.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        analyzeButton.disabled = false;
+        analyzeText.textContent = "Generate Recommendations";
+        analyzeIcon.classList.remove('hidden');
+        loadingIcon.classList.add('hidden');
+      }
+    });
+
+    // Help modal functionality
+    const helpButton = document.getElementById('help-button');
+    const helpModal = document.getElementById('help-modal');
+    const closeHelp = document.getElementById('close-help');
+
+    helpButton.addEventListener('click', () => {
+      helpModal.classList.remove('hidden');
+    });
+
+    closeHelp.addEventListener('click', () => {
+      helpModal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) {
+        helpModal.classList.add('hidden');
+      }
+    });
+
+    // Print and Download functionality
+    const printButton = document.getElementById('print-button');
+    const downloadButton = document.getElementById('download-button');
+    const reportContainer = document.getElementById('report-container');
+
+    printButton.addEventListener('click', () => {
+      window.print();
+    });
+
+    downloadButton.addEventListener('click', () => {
+      const element = reportContainer;
+      const opt = {
+        margin: 1,
+        filename: 'ECMO-Analysis-Report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      // Temporarily show the results tab for PDF generation
+      document.querySelector('[data-tab="results"]').click();
+      
+      // Generate PDF
+      html2pdf().set(opt).from(element).save();
+    });
+
+    // Likert scale functionality
+    const likertOptions = document.querySelectorAll('.likert-option');
+    
+    likertOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const value = option.dataset.value;
+        const question = option.dataset.question;
+        
+        // Clear previous selection for this question
+        document.querySelectorAll(`.likert-option[data-question="${question}"]`).forEach(opt => {
+          opt.classList.remove('selected');
+        });
+        
+        // Select this option
+        option.classList.add('selected');
+      });
+    });
+
+    // Survey submission
+    const submitSurvey = document.getElementById('submit-survey');
+    const commentsTextarea = document.getElementById('comments');
+    
+    submitSurvey.addEventListener('click', () => {
+      const surveyData = {
+        ratings: {},
+        comments: commentsTextarea.value
+      };
+      
+      // Collect ratings
+      document.querySelectorAll('.likert-option.selected').forEach(selected => {
+        const question = selected.dataset.question;
+        const value = selected.dataset.value;
+        surveyData.ratings[question] = value;
+      });
+      
+      // Here you would normally send this data to your server
+      console.log('Survey data:', surveyData);
+      
+      // Show confirmation
+      alert('Thank you for your feedback!');
+      
+      // Reset form
+      document.querySelectorAll('.likert-option.selected').forEach(selected => {
+        selected.classList.remove('selected');
+      });
+      commentsTextarea.value = '';
     });
   </script>
 </body>

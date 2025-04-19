@@ -47,6 +47,7 @@ Please:
 2. Score them and compute the ECMO-SVC Score
 3. Recommend timing (None, Standby, Elective, Rescue)
 4. Explain your reasoning
+
     `;
   } else {
     return res.status(400).json({ error: "Invalid mode" });

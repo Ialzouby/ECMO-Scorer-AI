@@ -2,9 +2,11 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
 dotenv.config();
 
 const ecmoRoute = require('./routes/ecmo');
+const surveyRoute = require('./routes/survey');
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use(express.json());
 
 // ✅ API Routes
 app.use('/api/ecmo-score', ecmoRoute);
+app.use('/api/survey', surveyRoute);
+
 
 // ✅ Serve notes.html on root URL
 app.get('/', (req, res) => {

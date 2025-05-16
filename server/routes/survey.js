@@ -1,22 +1,29 @@
 const express = require('express');
-const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const router = express.Router();
 
-// Save to a JSON file (or connect to a DB in production)
-const surveyFile = path.join(__dirname, '../data/survey_results.json');
+const surveyFile = path.join(__dirname, '..', 'data', 'survey_results.json');
 
+// Ensure the file exists
+if (!fs.existsSync(surveyFile)) {
+  fs.writeFileSync(surveyFile, '[]'); // empty array to start
+}
+
+// POST /api/survey
 router.post('/', (req, res) => {
-  const survey = req.body;
+  const newResponse = req.body;
 
-  let existing = [];
-  if (fs.existsSync(surveyFile)) {
-    existing = JSON.parse(fs.readFileSync(surveyFile));
+  try {
+    const data = fs.readFileSync(surveyFile, 'utf8');
+    const responses = JSON.parse(data);
+    responses.push(newResponse);
+    fs.writeFileSync(surveyFile, JSON.stringify(responses, null, 2));
+    res.status(200).json({ message: 'Survey submitted successfully.' });
+  } catch (err) {
+    console.error('❌ Error saving survey:', err);
+    res.status(500).json({ error: 'Failed to save survey.' });
   }
-  existing.push(survey);
-  fs.writeFileSync(surveyFile, JSON.stringify(existing, null, 2));
-
-  res.json({ success: true });
 });
 
 module.exports = router;

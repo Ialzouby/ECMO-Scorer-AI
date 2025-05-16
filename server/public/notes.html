@@ -754,34 +754,54 @@ downloadButton.addEventListener('click', () => {
     const submitSurvey = document.getElementById('submit-survey');
     const commentsTextarea = document.getElementById('comments');
     
-    submitSurvey.addEventListener('click', () => {
-      const surveyData = {
-        ratings: {},
-        comments: commentsTextarea.value
-      };
-      
-      // Collect ratings
-      document.querySelectorAll('.likert-option.selected').forEach(selected => {
-        const question = selected.dataset.question;
-        const value = selected.dataset.value;
-        surveyData.ratings[question] = value;
-      });
-      
-      // Here you would normally send this data to your server
-      console.log('Survey data:', surveyData);
-      
-      // Show confirmation
-      localStorage.setItem('surveySubmitted', 'true');
-alert('Thank you for your feedback! You can now print or download the report.');
+    submitSurvey.addEventListener('click', async () => {
+  const surveyData = {
+    ratings: {},
+    comments: commentsTextarea.value.trim()
+  };
 
-      
+  // Collect ratings
+  document.querySelectorAll('.likert-option.selected').forEach(selected => {
+    const question = selected.dataset.question;
+    const value = selected.dataset.value;
+    surveyData.ratings[question] = value;
+  });
+
+  // Validation: Require at least 3 questions or a comment
+  if (Object.keys(surveyData.ratings).length < 3 && !surveyData.comments) {
+    alert('⚠️ Please answer at least 3 questions or leave a comment before submitting.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/survey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(surveyData)
+    });
+
+    if (res.ok) {
+      localStorage.setItem('surveySubmitted', 'true');
+      alert('✅ Thank you for your feedback! You can now print or download the report.');
+
       // Reset form
       document.querySelectorAll('.likert-option.selected').forEach(selected => {
         selected.classList.remove('selected');
       });
       commentsTextarea.value = '';
-    });
+    } else {
+      alert('❌ Failed to submit feedback. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error submitting survey:', error);
+    alert('❌ Error sending survey. Check your connection.');
+  }
+});
 
+      
+ 
+
+      
     // Toggle survey dropdown
 const toggleSurveyBtn = document.getElementById('toggle-survey');
 const surveyContent = document.getElementById('survey-content');

@@ -370,7 +370,23 @@
       </div>
 
       <!-- Survey Section -->
-      <div id="survey-section" class="card p-6 mb-8 no-print hidden">
+<!-- Survey Section Dropdown -->
+<div id="survey-section" class="mb-8 no-print hidden">
+  <button
+    id="toggle-survey"
+    class="btn btn-outline w-full flex justify-between items-center px-4 py-2 text-left rounded-md border border-gray-300 dark:border-gray-700"
+  >
+    <span class="text-sm font-medium">Click to provide feedback (ESS-AI Usability Survey)</span>
+    <svg id="survey-arrow" class="w-5 h-5 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <div id="survey-content" class="card p-6 mt-4 hidden">
+    <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
+    
+    <!-- The rest of your survey questions and submit button stays exactly the same -->
         <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
         
@@ -756,6 +772,19 @@ try {
       });
       commentsTextarea.value = '';
     });
+
+    // Toggle survey dropdown
+const toggleSurveyBtn = document.getElementById('toggle-survey');
+const surveyContent = document.getElementById('survey-content');
+const surveyArrow = document.getElementById('survey-arrow');
+
+if (toggleSurveyBtn) {
+  toggleSurveyBtn.addEventListener('click', () => {
+    surveyContent.classList.toggle('hidden');
+    surveyArrow.classList.toggle('rotate-180');
+  });
+}
+
   </script>
 </body>
 </html>

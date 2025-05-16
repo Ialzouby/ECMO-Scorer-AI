@@ -10,10 +10,10 @@ const surveyRoute = require('./routes/survey');
 
 const app = express();
 
-// ✅ Serve frontend HTML + assets
+// ✅ Serve frontend HTML + assets (MUST come before catch-all)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ CORS Setup for API
+// ✅ CORS Setup
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -21,20 +21,19 @@ app.use(cors({
 }));
 app.options('*', cors());
 
-// ✅ Parse incoming JSON
+// ✅ Parse JSON
 app.use(express.json());
 
 // ✅ API Routes
 app.use('/api/ecmo-score', ecmoRoute);
 app.use('/api/survey', surveyRoute);
 
-
-// ✅ Serve notes.html on root URL
+// ✅ Serve notes.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'notes.html'));
 });
 
-// ✅ 405 catch-all
+// ✅ 405 Catch-all (move this LAST!)
 app.all('*', (req, res) => {
   console.log(`🚫 Method not allowed: ${req.method} on ${req.originalUrl}`);
   res.status(405).send(`🚫 Method Not Allowed: ${req.method} on ${req.originalUrl}`);

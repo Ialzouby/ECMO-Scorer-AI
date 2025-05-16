@@ -346,119 +346,120 @@
                       Download PDF
                     </button>
                   </div>
-                  <div id="survey-section" class="mb-8 no-print hidden">
-                    <button
-                      id="toggle-survey"
-                      class="btn btn-outline w-full flex justify-between items-center px-4 py-2 text-left rounded-md border border-gray-300 dark:border-gray-700"
-                    >
-                      <span class="text-sm font-medium">Click to provide feedback (ESS-AI Usability Survey)</span>
-                      <svg id="survey-arrow" class="w-5 h-5 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  
-                    <div id="survey-content" class="card p-6 mt-4 hidden">
-                      <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
-                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
-                      
-                      <!-- The rest of your survey questions and submit button stays exactly the same -->
-                          <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
-                          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
-                          
-                          <div class="space-y-6">
-                            <!-- Likert Scale Questions -->
-                            <div class="space-y-4">
-                              <div class="space-y-2">
-                                <p class="text-sm font-medium">1. The system was easy to use.</p>
-                                <div class="flex items-center justify-between max-w-md">
-                                  <span class="text-xs text-gray-500">Strongly Disagree</span>
-                                  <div class="flex space-x-6">
-                                    <div class="likert-option" data-value="1" data-question="1"></div>
-                                    <div class="likert-option" data-value="2" data-question="1"></div>
-                                    <div class="likert-option" data-value="3" data-question="1"></div>
-                                    <div class="likert-option" data-value="4" data-question="1"></div>
-                                    <div class="likert-option" data-value="5" data-question="1"></div>
-                                  </div>
-                                  <span class="text-xs text-gray-500">Strongly Agree</span>
-                                </div>
-                              </div>
-                              
-                              <div class="space-y-2">
-                                <p class="text-sm font-medium">2. The recommendations provided were helpful.</p>
-                                <div class="flex items-center justify-between max-w-md">
-                                  <span class="text-xs text-gray-500">Strongly Disagree</span>
-                                  <div class="flex space-x-6">
-                                    <div class="likert-option" data-value="1" data-question="2"></div>
-                                    <div class="likert-option" data-value="2" data-question="2"></div>
-                                    <div class="likert-option" data-value="3" data-question="2"></div>
-                                    <div class="likert-option" data-value="4" data-question="2"></div>
-                                    <div class="likert-option" data-value="5" data-question="2"></div>
-                                  </div>
-                                  <span class="text-xs text-gray-500">Strongly Agree</span>
-                                </div>
-                              </div>
-                              
-                              <div class="space-y-2">
-                                <p class="text-sm font-medium">3. I would use this system in my clinical practice.</p>
-                                <div class="flex items-center justify-between max-w-md">
-                                  <span class="text-xs text-gray-500">Strongly Disagree</span>
-                                  <div class="flex space-x-6">
-                                    <div class="likert-option" data-value="1" data-question="3"></div>
-                                    <div class="likert-option" data-value="2" data-question="3"></div>
-                                    <div class="likert-option" data-value="3" data-question="3"></div>
-                                    <div class="likert-option" data-value="4" data-question="3"></div>
-                                    <div class="likert-option" data-value="5" data-question="3"></div>
-                                  </div>
-                                  <span class="text-xs text-gray-500">Strongly Agree</span>
-                                </div>
-                              </div>
-                              
-                              <div class="space-y-2">
-                                <p class="text-sm font-medium">4. The system saved me time in decision making.</p>
-                                <div class="flex items-center justify-between max-w-md">
-                                  <span class="text-xs text-gray-500">Strongly Disagree</span>
-                                  <div class="flex space-x-6">
-                                    <div class="likert-option" data-value="1" data-question="4"></div>
-                                    <div class="likert-option" data-value="2" data-question="4"></div>
-                                    <div class="likert-option" data-value="3" data-question="4"></div>
-                                    <div class="likert-option" data-value="4" data-question="4"></div>
-                                    <div class="likert-option" data-value="5" data-question="4"></div>
-                                  </div>
-                                  <span class="text-xs text-gray-500">Strongly Agree</span>
-                                </div>
-                              </div>
-                              
-                              <div class="space-y-2">
-                                <p class="text-sm font-medium">5. I trust the recommendations provided by the system.</p>
-                                <div class="flex items-center justify-between max-w-md">
-                                  <span class="text-xs text-gray-500">Strongly Disagree</span>
-                                  <div class="flex space-x-6">
-                                    <div class="likert-option" data-value="1" data-question="5"></div>
-                                    <div class="likert-option" data-value="2" data-question="5"></div>
-                                    <div class="likert-option" data-value="3" data-question="5"></div>
-                                    <div class="likert-option" data-value="4" data-question="5"></div>
-                                    <div class="likert-option" data-value="5" data-question="5"></div>
-                                  </div>
-                                  <span class="text-xs text-gray-500">Strongly Agree</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <!-- Open-ended Comments -->
+
+                </div>
+                <div id="survey-section" class="mb-8 no-print hidden">
+                  <button
+                    id="toggle-survey"
+                    class="btn btn-outline w-full flex justify-between items-center px-4 py-2 text-left rounded-md border border-gray-300 dark:border-gray-700"
+                  >
+                    <span class="text-sm font-medium">Click to provide feedback (ESS-AI Usability Survey)</span>
+                    <svg id="survey-arrow" class="w-5 h-5 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                
+                  <div id="survey-content" class="card p-6 mt-4 hidden">
+                    <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
+                    
+                    <!-- The rest of your survey questions and submit button stays exactly the same -->
+                        <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
+                        
+                        <div class="space-y-6">
+                          <!-- Likert Scale Questions -->
+                          <div class="space-y-4">
                             <div class="space-y-2">
-                              <label for="comments" class="text-sm font-medium">Additional Comments:</label>
-                              <textarea id="comments" class="textarea" placeholder="Please share any additional feedback or suggestions..."></textarea>
+                              <p class="text-sm font-medium">1. The system was easy to use.</p>
+                              <div class="flex items-center justify-between max-w-md">
+                                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                                <div class="flex space-x-6">
+                                  <div class="likert-option" data-value="1" data-question="1"></div>
+                                  <div class="likert-option" data-value="2" data-question="1"></div>
+                                  <div class="likert-option" data-value="3" data-question="1"></div>
+                                  <div class="likert-option" data-value="4" data-question="1"></div>
+                                  <div class="likert-option" data-value="5" data-question="1"></div>
+                                </div>
+                                <span class="text-xs text-gray-500">Strongly Agree</span>
+                              </div>
                             </div>
                             
-                            <button id="submit-survey" class="btn btn-primary">Submit Feedback</button>
+                            <div class="space-y-2">
+                              <p class="text-sm font-medium">2. The recommendations provided were helpful.</p>
+                              <div class="flex items-center justify-between max-w-md">
+                                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                                <div class="flex space-x-6">
+                                  <div class="likert-option" data-value="1" data-question="2"></div>
+                                  <div class="likert-option" data-value="2" data-question="2"></div>
+                                  <div class="likert-option" data-value="3" data-question="2"></div>
+                                  <div class="likert-option" data-value="4" data-question="2"></div>
+                                  <div class="likert-option" data-value="5" data-question="2"></div>
+                                </div>
+                                <span class="text-xs text-gray-500">Strongly Agree</span>
+                              </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                              <p class="text-sm font-medium">3. I would use this system in my clinical practice.</p>
+                              <div class="flex items-center justify-between max-w-md">
+                                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                                <div class="flex space-x-6">
+                                  <div class="likert-option" data-value="1" data-question="3"></div>
+                                  <div class="likert-option" data-value="2" data-question="3"></div>
+                                  <div class="likert-option" data-value="3" data-question="3"></div>
+                                  <div class="likert-option" data-value="4" data-question="3"></div>
+                                  <div class="likert-option" data-value="5" data-question="3"></div>
+                                </div>
+                                <span class="text-xs text-gray-500">Strongly Agree</span>
+                              </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                              <p class="text-sm font-medium">4. The system saved me time in decision making.</p>
+                              <div class="flex items-center justify-between max-w-md">
+                                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                                <div class="flex space-x-6">
+                                  <div class="likert-option" data-value="1" data-question="4"></div>
+                                  <div class="likert-option" data-value="2" data-question="4"></div>
+                                  <div class="likert-option" data-value="3" data-question="4"></div>
+                                  <div class="likert-option" data-value="4" data-question="4"></div>
+                                  <div class="likert-option" data-value="5" data-question="4"></div>
+                                </div>
+                                <span class="text-xs text-gray-500">Strongly Agree</span>
+                              </div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                              <p class="text-sm font-medium">5. I trust the recommendations provided by the system.</p>
+                              <div class="flex items-center justify-between max-w-md">
+                                <span class="text-xs text-gray-500">Strongly Disagree</span>
+                                <div class="flex space-x-6">
+                                  <div class="likert-option" data-value="1" data-question="5"></div>
+                                  <div class="likert-option" data-value="2" data-question="5"></div>
+                                  <div class="likert-option" data-value="3" data-question="5"></div>
+                                  <div class="likert-option" data-value="4" data-question="5"></div>
+                                  <div class="likert-option" data-value="5" data-question="5"></div>
+                                </div>
+                                <span class="text-xs text-gray-500">Strongly Agree</span>
+                              </div>
+                            </div>
                           </div>
                           
-                          <div class="mt-4 text-xs text-gray-500">
-                            <p>Survey adapted from: Brennan M, Puri S, Ozrazgat-Baslanti T, Feng Z, Ruppert M, Hashemighouchani H, Momcilovic P, Li X, Wang DZ, Bihorac A. Comparing clinical judgment with the MySurgeryRisk algorithm for preoperative risk assessment: A pilot usability study. Surgery. 2019 May;165(5):1035-1045. doi: 10.1016/j.surg.2019.01.002. Epub 2019 Feb 18. PMID: 30792011; PMCID: PMC6502657.</p>
+                          <!-- Open-ended Comments -->
+                          <div class="space-y-2">
+                            <label for="comments" class="text-sm font-medium">Additional Comments:</label>
+                            <textarea id="comments" class="textarea" placeholder="Please share any additional feedback or suggestions..."></textarea>
                           </div>
+                          
+                          <button id="submit-survey" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                        
+                        <div class="mt-4 text-xs text-gray-500">
+                          <p>Survey adapted from: Brennan M, Puri S, Ozrazgat-Baslanti T, Feng Z, Ruppert M, Hashemighouchani H, Momcilovic P, Li X, Wang DZ, Bihorac A. Comparing clinical judgment with the MySurgeryRisk algorithm for preoperative risk assessment: A pilot usability study. Surgery. 2019 May;165(5):1035-1045. doi: 10.1016/j.surg.2019.01.002. Epub 2019 Feb 18. PMID: 30792011; PMCID: PMC6502657.</p>
                         </div>
                       </div>
-                </div>
+                    </div>
               </div>
             </div>
           </div>

@@ -4,11 +4,6 @@
 
 ---
 
-## Project Overview
-This repo contains a **single‑page web application** (SPA) and **Node.js/Express backend** that together provide real‑time, AI‑driven recommendations for initiating ECMO in patients with SVC syndrome.
-
-The backend exposes secure REST endpoints that forward clinician‑entered patient data to **OpenAI GPT‑4o** for scoring and returns structured recommendations. A lightweight usability survey records feedback in JSON for iterative improvement.
-
 ## Data Flow & Architecture
 ```mermaid
 flowchart TD
@@ -33,6 +28,13 @@ flowchart TD
     C--POST JSON-->F
     F--Append-->H
 ```
+
+---
+
+## Project Overview
+This repo contains a **single‑page web application** (SPA) and **Node.js/Express backend** that together provide real‑time, AI‑driven recommendations for initiating ECMO in patients with SVC syndrome.
+
+The backend exposes secure REST endpoints that forward clinician‑entered patient data to **OpenAI GPT‑4o** for scoring and returns structured recommendations. A lightweight usability survey records feedback in JSON for iterative improvement.
 
 ---
 

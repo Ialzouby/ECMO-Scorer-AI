@@ -128,13 +128,16 @@ Returns HTTP `200 { message: "Survey submitted successfully." }`
 ### Static Asset Pipeline
 ```mermaid
 graph LR
-    CSS[Tailwind CDN]\n(dark‑mode)
-    JS[Vanilla JS]\n(html2pdf, localStorage)
+    CSS["Tailwind CDN<br/>(dark‑mode)"]
+    JS["Vanilla JS<br/>(html2pdf, localStorage)"]
     HTML[notes.html]
-    HTML-->Browser
-    CSS-->Browser
-    JS -->Browser
+    Browser((Browser))
+
+    CSS --> Browser
+    JS  --> Browser
+    HTML --> Browser
 ```
+
 
 ---
 

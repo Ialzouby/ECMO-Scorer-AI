@@ -146,8 +146,6 @@ graph LR
 |------------|-----------|
 | ![light](server/public/assets/cov.png) | ![dark](server/public/assets/cov.png) |
 
-*(Replace with actual UI captures)*
-
 ---
 
 ## Contributing

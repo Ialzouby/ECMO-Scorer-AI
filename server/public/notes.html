@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESS AI Scorer</title>
+  <title>Clinical Decision Support AI Tool</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
@@ -161,7 +161,7 @@
         
         <!-- Header Text -->
         <div class="flex flex-col">
-          <span class="font-bold text-lg text-gray-900 dark:text-white">ESS AI Tool</span>
+          <span class="font-bold text-lg text-gray-900 dark:text-white">Clinical AI Tools</span>
           <span class="text-sm text-gray-600 dark:text-gray-400">A product of The Covenant Intelligence Group</span>
         </div>
       </div>
@@ -178,13 +178,15 @@
           <div class="relative group">
             <button class="tab tab-inactive flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-              ECMO Tools
+              Tools
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1 h-4 w-4"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-            <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition ease-out duration-100 dark:bg-gray-800 dark:ring-gray-700">
-              <div class="py-1">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Dropdown Analysis</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Notes Analysis</a>
+            <div class="absolute left-0 top-full pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition ease-out duration-100">
+              <div class="rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700">
+                <div class="py-1">
+                  <a href="#" id="nav-ecmo-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">ECMO Scorer</a>
+                  <a href="#" id="nav-sts-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">STS Risk Calculator</a>
+                </div>
               </div>
             </div>
           </div>
@@ -221,13 +223,13 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Home
         </a>
-        <a href="#" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+        <a href="#" id="mobile-ecmo-link" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-          Dropdown Analysis
+          ECMO Scorer
         </a>
-        <a href="#" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
+        <a href="#" id="mobile-sts-link" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-          Notes Analysis
+          STS Risk Calculator
         </a>
         <a href="#" class="flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
@@ -253,8 +255,8 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M9.5 2a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/><path d="M14.5 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"/><path d="M3 7a2 2 0 0 0-2 2v1c0 1.1.9 2 2 2h18a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H3Z"/><path d="M9.5 12v2"/><path d="M14.5 12v2"/><path d="M3 12v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8"/><path d="M9.5 19a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5Z"/></svg>
             </div>
             <div>
-              <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">ECMO-SVC Score AI tool</h2>
-              <p class="text-gray-500 dark:text-gray-400">Artificial intelligence powered ECMO timing tool guided by SVC syndrome severity</p>
+              <h2 id="main-tool-title" class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">ECMO-SVC Score AI Tool</h2>
+              <p id="main-tool-description" class="text-gray-500 dark:text-gray-400">Artificial intelligence powered ECMO timing tool guided by SVC syndrome severity</p>
             </div>
           </div>
         </div>
@@ -275,7 +277,8 @@
             <div class="mt-8">
               <!-- Input Tab -->
               <div id="input-tab" class="tab-content animate-in">
-                <div class="space-y-6">
+                <!-- ECMO Form Fields -->
+                <div id="ecmo-form-fields" class="space-y-6">
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Patient History</label>
@@ -298,6 +301,17 @@
                       <span class="badge badge-outline">Optional</span>
                     </div>
                     <textarea id="additional-info" class="textarea min-h-[120px] resize-none" placeholder="Enter any additional information that might be relevant..."></textarea>
+                  </div>
+                </div>
+
+                <!-- STS Form Fields -->
+                <div id="sts-form-fields" class="space-y-6 hidden">
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Patient Notes</label>
+                      <span class="badge badge-outline">Required</span>
+                    </div>
+                    <textarea id="patient-notes" class="textarea min-h-[200px] resize-none" placeholder="Enter complete patient notes including history, physical examination, labs, imaging, and any other relevant clinical information..."></textarea>
                   </div>
                 </div>
 
@@ -336,9 +350,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     <h3 class="font-medium">Analysis Complete</h3>
                   </div>
-                  <div class="prose dark:prose-invert max-w-none">
-                    <pre id="result-text" class="whitespace-pre-wrap text-sm rounded-lg bg-gray-50 p-4 dark:bg-gray-900"></pre>
-                  </div>
+                  <div id="result-text" class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100"></div>
 
                   <div class="flex flex-wrap gap-3 mt-6 no-print">
                     <button id="print-button" class="btn btn-outline btn-sm">
@@ -356,15 +368,15 @@
                       id="toggle-survey"
                       class="btn btn-outline w-full flex justify-between items-center px-4 py-2 text-left rounded-md border border-gray-300 dark:border-gray-700"
                     >
-                      <span class="text-sm font-medium">Click to provide feedback (ESS-AI Usability Survey)</span>
+                      <span class="text-sm font-medium">Click to provide feedback (Usability Survey)</span>
                       <svg id="survey-arrow" class="w-5 h-5 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
                   
                     <div id="survey-content" class="card p-6 mt-4 hidden">
-                      <h3 class="text-xl font-semibold mb-4">ESS-AI Usability Survey</h3>
-                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the ECMO Analysis System:</p>
+                      <h3 class="text-xl font-semibold mb-4">Clinical AI Tools Usability Survey</h3>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Please rate your experience with the Clinical AI Tools:</p>
                       
   
                           <div class="space-y-6">
@@ -470,7 +482,7 @@
 
         <div class="flex justify-between p-6 border-t text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
           <div>UNC & Covenant Health</div>
-          <div>ECMO Analysis System v2.0</div>
+          <div>Clinical AI Tools v2.1</div>
         </div>
       </div>
 
@@ -502,13 +514,14 @@
         
         <div class="space-y-4">
           <div>
-            <h4 class="font-medium mb-2">About ECMO Analysis System</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400">This tool uses AI to analyze patient data and provide ECMO recommendations. It is designed to assist healthcare providers in their decision-making process.</p>
+            <h4 class="font-medium mb-2">About Clinical AI Tools</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">This system provides AI-powered clinical decision support tools including ECMO-SVC scoring and STS risk assessment. It is designed to assist healthcare providers in their decision-making process.</p>
           </div>
           
           <div>
             <h4 class="font-medium mb-2">How to Use</h4>
             <ol class="text-sm text-gray-600 dark:text-gray-400 space-y-2 list-decimal list-inside">
+              <li>Select your desired tool (ECMO-SVC Score or STS Risk Score)</li>
               <li>Enter patient history in the first text box</li>
               <li>Enter physical examination findings in the second text box</li>
               <li>Click "Generate Recommendations" to receive AI analysis</li>
@@ -532,6 +545,49 @@
   </div>
 
   <script>
+    // Global state for selected tool
+    let selectedTool = 'ecmo'; // default to ECMO
+
+    // Tool configuration
+    const toolConfig = {
+      ecmo: {
+        title: 'ECMO-SVC Score AI Tool',
+        description: 'Artificial intelligence powered ECMO timing tool guided by SVC syndrome severity',
+        endpoint: '/api/ecmo-score'
+      },
+      sts: {
+        title: 'STS Risk Score Calculator',
+        description: 'Artificial intelligence powered cardiac surgery risk assessment using STS scoring',
+        endpoint: '/api/sts-score'
+      }
+    };
+
+    // Simple markdown to HTML converter
+    function markdownToHtml(text) {
+      // Convert headers
+      text = text.replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>');
+      text = text.replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>');
+      text = text.replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>');
+      
+      // Convert bold text
+      text = text.replace(/\*\*\*([^*]+)\*\*\*/gim, '<strong class="font-bold">$1</strong>');
+      text = text.replace(/\*\*([^*]+)\*\*/gim, '<strong class="font-bold">$1</strong>');
+      text = text.replace(/\*([^*]+)\*/gim, '<em>$1</em>');
+      
+      // Convert line breaks
+      text = text.replace(/\n\n/g, '</p><p class="mb-3">');
+      text = text.replace(/\n/g, '<br>');
+      
+      // Convert unordered lists
+      text = text.replace(/^\- (.*)$/gim, '<li class="ml-4">• $1</li>');
+      text = text.replace(/^• (.*)$/gim, '<li class="ml-4">• $1</li>');
+      
+      // Wrap in paragraph tags
+      text = '<p class="mb-3">' + text + '</p>';
+      
+      return text;
+    }
+
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
@@ -558,6 +614,95 @@
         localStorage.setItem('theme', 'dark');
       }
     });
+
+    // Form elements - declare early
+    const historyTextarea = document.getElementById('history');
+    const examTextarea = document.getElementById('exam');
+    const patientNotesTextarea = document.getElementById('patient-notes');
+    const analyzeButton = document.getElementById('analyze-button');
+    
+    // Enable/disable analyze button based on form inputs
+    function updateAnalyzeButton() {
+      if (selectedTool === 'ecmo') {
+        // ECMO requires both history and exam
+        const hasHistory = historyTextarea && historyTextarea.value.trim();
+        const hasExam = examTextarea && examTextarea.value.trim();
+        
+        if (hasHistory && hasExam) {
+          analyzeButton.disabled = false;
+        } else {
+          analyzeButton.disabled = true;
+        }
+      } else if (selectedTool === 'sts') {
+        // STS requires only patient notes
+        const hasNotes = patientNotesTextarea && patientNotesTextarea.value.trim();
+        
+        if (hasNotes) {
+          analyzeButton.disabled = false;
+        } else {
+          analyzeButton.disabled = true;
+        }
+      } else {
+        analyzeButton.disabled = true;
+      }
+    }
+
+    // Tool selector functionality
+    const mainToolTitle = document.getElementById('main-tool-title');
+    const mainToolDescription = document.getElementById('main-tool-description');
+    const ecmoFormFields = document.getElementById('ecmo-form-fields');
+    const stsFormFields = document.getElementById('sts-form-fields');
+
+    function updateToolSelection(tool) {
+      selectedTool = tool;
+      const config = toolConfig[tool];
+      
+      // Update title and description
+      mainToolTitle.textContent = config.title;
+      mainToolDescription.textContent = config.description;
+      
+      // Get additional info elements
+      const additionalInfoBtn = document.getElementById('additional-info-button');
+      const additionalInfoCtr = document.getElementById('additional-info-container');
+      
+      // Toggle form fields
+      if (tool === 'ecmo') {
+        ecmoFormFields.classList.remove('hidden');
+        stsFormFields.classList.add('hidden');
+        // Show additional info button for ECMO (if not already showing the container)
+        if (additionalInfoBtn && additionalInfoCtr && additionalInfoCtr.classList.contains('hidden')) {
+          additionalInfoBtn.classList.remove('hidden');
+        }
+      } else if (tool === 'sts') {
+        ecmoFormFields.classList.add('hidden');
+        stsFormFields.classList.remove('hidden');
+        // Hide additional info button for STS
+        if (additionalInfoBtn) {
+          additionalInfoBtn.classList.add('hidden');
+        }
+        if (additionalInfoCtr) {
+          additionalInfoCtr.classList.add('hidden');
+        }
+      }
+      
+      // Update analyze button state
+      updateAnalyzeButton();
+      
+      // Save preference
+      localStorage.setItem('selectedTool', tool);
+    }
+
+    // Restore saved tool preference
+    const savedTool = localStorage.getItem('selectedTool');
+    if (savedTool && toolConfig[savedTool]) {
+      updateToolSelection(savedTool);
+    } else {
+      // Default to ECMO if no saved preference
+      updateToolSelection('ecmo');
+    }
+    
+    // Initial button state check
+    updateAnalyzeButton();
     
     // Mobile menu toggle
     const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -566,6 +711,42 @@
     mobileMenuButton.addEventListener('click', () => {
       mobileMenu.classList.toggle('hidden');
     });
+
+    // Navigation dropdown links (desktop and mobile)
+    const navEcmoLink = document.getElementById('nav-ecmo-link');
+    const navStsLink = document.getElementById('nav-sts-link');
+    const mobileEcmoLink = document.getElementById('mobile-ecmo-link');
+    const mobileStsLink = document.getElementById('mobile-sts-link');
+    
+    if (navEcmoLink) {
+      navEcmoLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        updateToolSelection('ecmo');
+      });
+    }
+    
+    if (navStsLink) {
+      navStsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        updateToolSelection('sts');
+      });
+    }
+
+    if (mobileEcmoLink) {
+      mobileEcmoLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        updateToolSelection('ecmo');
+        mobileMenu.classList.add('hidden'); // Close mobile menu after selection
+      });
+    }
+    
+    if (mobileStsLink) {
+      mobileStsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        updateToolSelection('sts');
+        mobileMenu.classList.add('hidden'); // Close mobile menu after selection
+      });
+    }
     
     // Tab functionality
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -597,10 +778,7 @@
       });
     });
     
-    // Form functionality
-    const historyTextarea = document.getElementById('history');
-    const examTextarea = document.getElementById('exam');
-    const analyzeButton = document.getElementById('analyze-button');
+    // Form functionality - Additional elements
     const additionalInfoButton = document.getElementById('additional-info-button');
     const additionalInfoContainer = document.getElementById('additional-info-container');
     const errorMessage = document.getElementById('error-message');
@@ -611,17 +789,16 @@
     const resultsEmpty = document.getElementById('results-empty');
     const resultsContent = document.getElementById('results-content');
     
-    // Enable/disable analyze button based on form inputs
-    function updateAnalyzeButton() {
-      if (historyTextarea.value.trim() && examTextarea.value.trim()) {
-        analyzeButton.disabled = false;
-      } else {
-        analyzeButton.disabled = true;
-      }
+    // Set up input event listeners
+    if (historyTextarea) {
+      historyTextarea.addEventListener('input', updateAnalyzeButton);
     }
-    
-    historyTextarea.addEventListener('input', updateAnalyzeButton);
-    examTextarea.addEventListener('input', updateAnalyzeButton);
+    if (examTextarea) {
+      examTextarea.addEventListener('input', updateAnalyzeButton);
+    }
+    if (patientNotesTextarea) {
+      patientNotesTextarea.addEventListener('input', updateAnalyzeButton);
+    }
     
     // Show additional information field
     additionalInfoButton.addEventListener('click', () => {
@@ -638,40 +815,61 @@
       loadingIcon.classList.remove('hidden');
       errorMessage.classList.add('hidden');
       
-// Simulate API call (replace with actual API call)
-try {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      try {
+        // Get the correct endpoint based on selected tool
+        const endpoint = toolConfig[selectedTool].endpoint;
+        
+        // Prepare request data based on selected tool
+        let requestData;
+        
+        if (selectedTool === 'ecmo') {
+          requestData = {
+            mode: 'notes',
+            data: {
+              history: historyTextarea.value.trim(),
+              exam: examTextarea.value.trim()
+            }
+          };
 
-  // Simulate response
-  const response = {
-    success: true,
-    data: {
-      response: "ECMO ANALYSIS RESULTS:\n\n" +
-               "Patient Condition: Severe respiratory distress\n" +
-               "Key Findings:\n" +
-               "- Shortness of breath\n" +
-               "- Facial swelling\n" +
-               "- Tracheal deviation\n" +
-               "- Low oxygen saturation (88%)\n\n" +
-               "ECMO Recommendation: Consider immediate ECMO evaluation\n" +
-               "Risk Assessment: High risk for respiratory failure\n" +
-               "Additional Recommendations:\n" +
-               "- Urgent chest imaging to rule out pneumothorax\n" +
-               "- Prepare for possible intubation\n" +
-               "- Consult ECMO team immediately"
-    }
-  };
+          // Add additional info if provided
+          const additionalInfo = document.getElementById('additional-info');
+          if (additionalInfo && additionalInfo.value.trim()) {
+            requestData.data.notes = additionalInfo.value.trim();
+          }
+        } else if (selectedTool === 'sts') {
+          requestData = {
+            mode: 'notes',
+            data: {
+              patientNotes: patientNotesTextarea.value.trim()
+            }
+          };
+        }
 
-  resultText.textContent = response.data.response;
-  resultsEmpty.classList.add('hidden');
-  resultsContent.classList.remove('hidden');
-  document.querySelector('[data-tab="results"]').click();
+        // Make API call
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        });
 
-  document.getElementById('survey-section').classList.remove('hidden');
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
 
+        const data = await response.json();
+        
+        // Convert markdown to HTML for prettier display
+        resultText.innerHTML = markdownToHtml(data.response);
+        resultsEmpty.classList.add('hidden');
+        resultsContent.classList.remove('hidden');
+        document.querySelector('[data-tab="results"]').click();
+
+        document.getElementById('survey-section').classList.remove('hidden');
 
       } catch (error) {
+        console.error('Error analyzing notes:', error);
         // Show error message
         errorMessage.classList.remove('hidden');
       } finally {

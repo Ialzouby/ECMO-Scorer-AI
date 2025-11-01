@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const ecmoRoute = require('./routes/ecmo');
+const stsRoute = require('./routes/sts');
 const surveyRoute = require('./routes/survey');
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.json());
 
 // ✅ API Routes
 app.use('/api/ecmo-score', ecmoRoute);
+app.use('/api/sts-score', stsRoute);
 app.use('/api/survey', surveyRoute);
 
 // ✅ Serve notes.html
@@ -40,7 +42,7 @@ app.all('*', (req, res) => {
 });
 
 // ✅ Start server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
 });

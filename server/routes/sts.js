@@ -17,11 +17,11 @@ function generateSTSFormHTML(data) {
   
   return `
 <style>
-  .sts-container { font-family: Arial, sans-serif; font-size: 9px; width: 100%; }
-  .sts-outer-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .sts-outer-table td { padding: 0 8px; vertical-align: top; width: 33.33%; }
-  .sts-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .sts-table td { padding: 3px 5px; vertical-align: middle; border: none; }
+  .sts-container { font-family: Arial, sans-serif; font-size: 9px; width: 100%; margin: 0; padding: 0; line-height: 0; }
+  .sts-outer-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; padding: 0; border-spacing: 0; }
+  .sts-outer-table td { padding: 0 8px; vertical-align: top; width: 33.33%; margin: 0; }
+  .sts-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; padding: 0; border-spacing: 0; }
+  .sts-table td { padding: 3px 5px; vertical-align: middle; border: none; margin: 0; }
   .sts-label { font-weight: 500; font-size: 9px; width: 35%; }
   .sts-value { width: 65%; }
   .sts-input, .sts-select { padding: 2px 4px; border: 1px solid #999; border-radius: 2px; font-size: 9px; width: 100%; }
@@ -30,20 +30,8 @@ function generateSTSFormHTML(data) {
   .sts-checkbox-label { font-size: 9px; margin-left: 3px; }
 </style>
 
-<div style="overflow-x: auto; width: 100%; margin: 0; padding: 0;">
-<div class="sts-container" style="margin: 0; padding: 0;">
-  <div style="background: #003366; color: white; padding: 6px; margin: 0; text-align: center;">
-    <div style="font-size: 14px; font-weight: 600; margin: 0;">STS Short-term / Operative Risk Calculator</div>
-    <div style="font-size: 9px; font-style: italic; margin: 2px 0 0 0;">Adult Cardiac Surgery Database - Extracted Patient Data</div>
-  </div>
-  <table class="sts-outer-table" style="margin: 0; padding: 0; border-spacing: 0;">
-    <tr>
-    
-    <!-- COLUMN 1 -->
-    <td>
-      
-      <table class="sts-table">
-        <tr><td colspan="2" class="sts-section">PLANNED SURGERY</td></tr>
+<div style="overflow-x: auto; width: 100%; margin: 0; padding: 0; min-width: 1200px; line-height: 0; font-size: 0;">
+<div class="sts-container" style="margin: 0; padding: 0; width: 100%; min-width: 1200px; line-height: 0; font-size: 0;"><table class="sts-outer-table" style="margin: 0; padding: 0; border-spacing: 0; border-collapse: collapse; line-height: normal; font-size: 9px; display: table;"><tr style="margin: 0; padding: 0; vertical-align: top;"><td style="margin: 0; padding: 0 8px; vertical-align: top; width: 33.33%;"><table class="sts-table" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;"><tr style="margin: 0; padding: 0;"><td colspan="2" class="sts-section" style="margin: 0; padding: 5px;">PLANNED SURGERY</td></tr>
         
         <tr>
           <td class="sts-label">Procedure Type:</td>
@@ -204,13 +192,7 @@ function generateSTSFormHTML(data) {
         
       </table>
       
-    </td>
-    
-    <!-- COLUMN 2 -->
-    <td>
-      
-      <table class="sts-table">
-        <tr><td colspan="2" class="sts-section">RISK FACTORS / COMORBIDITIES</td></tr>
+    </td><td style="margin: 0; padding: 0 8px; vertical-align: top; width: 33.33%;"><table class="sts-table" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;"><tr style="margin: 0; padding: 0;"><td colspan="2" class="sts-section" style="margin: 0; padding: 5px;">RISK FACTORS / COMORBIDITIES</td></tr>
         
         <tr>
           <td class="sts-label">Diabetes:</td>
@@ -375,14 +357,7 @@ function generateSTSFormHTML(data) {
         <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('resuscitation')} disabled /> Resuscitation ≤ 1hr</label></td></tr>
         
       </table>
-      
-    </td>
-    
-    <!-- COLUMN 3 -->
-    <td>
-      
-      <table class="sts-table">
-        <tr><td colspan="2" class="sts-section">CORONARY ARTERY DISEASE</td></tr>
+    </td><td style="margin: 0; padding: 0 8px; vertical-align: top; width: 33.33%;"><table class="sts-table" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;"><tr style="margin: 0; padding: 0;"><td colspan="2" class="sts-section" style="margin: 0; padding: 5px;">CORONARY ARTERY DISEASE</td></tr>
         
         <tr>
           <td class="sts-label">Primary Coronary Symptom:</td>
@@ -522,11 +497,7 @@ function generateSTSFormHTML(data) {
         <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('previousPCI')} disabled /> Previous PCI</label></td></tr>
         
       </table>
-      
-    </td>
-    
-    </tr>
-  </table>
+    </td></tr></table>
   
   <div style="margin-top: 15px; padding: 8px; background: #e6f2ff; border-left: 4px solid #003366; font-size: 9px;">
     <strong>📊 Data Extraction Summary:</strong> ${Object.values(data).filter(v => v !== null && v !== undefined && v !== '').length} fields extracted. Yellow highlights = extracted values.

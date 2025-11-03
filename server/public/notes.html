@@ -241,7 +241,7 @@
 
   <!-- Main Content -->
   <main class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-4 md:p-8 lg:p-10 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-7xl mx-auto">
       <!-- Medical Disclaimer -->
       <div class="mb-6 p-4 border rounded-lg bg-yellow-50 text-yellow-800 text-sm dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800/30">
         <p class="font-medium">Medical Disclaimer</p>
@@ -352,12 +352,8 @@
                     Submit patient notes to see extracted structured data.
                   </p>
                 </div>
-                <div id="patient-data-content" class="bg-white rounded-lg border p-6 shadow-sm hidden dark:bg-gray-800 dark:border-gray-700">
-                  <div class="flex items-center gap-2 mb-4 text-primary-600 dark:text-primary-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    <h3 class="font-medium">Patient Data Extracted</h3>
-                  </div>
-                  <div id="patient-data-text" class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100"></div>
+                <div id="patient-data-content" class="bg-white rounded-lg border shadow-sm hidden dark:bg-gray-800 dark:border-gray-700" style="width: 100%; overflow-x: auto; min-width: 1200px; padding: 0; margin: 0; line-height: 0;">
+                  <div id="patient-data-text" style="max-width: none; width: 100%; margin: 0; padding: 0; line-height: 0; font-size: 0; display: block;"></div>
                 </div>
               </div>
 

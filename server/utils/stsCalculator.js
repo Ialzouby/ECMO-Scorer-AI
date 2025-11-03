@@ -93,29 +93,41 @@ function calculateSTSRisk(patientData) {
  * Based on key risk factors with approximate coefficients
  */
 function calculateCABGMortalityDetailed(data) {
-  let logit = -6.5; // Baseline intercept (approximate)
+  let logit = -6.0; // Baseline intercept (calibrated to match typical STS baseline risk ~2-3% with standard risk factors)
   const steps = [];
   
   steps.push({
     variable: 'Baseline Intercept',
     value: 'N/A',
-    coefficient: -6.5,
-    contribution: -6.5,
+    coefficient: -6.0,
+    contribution: -6.0,
     description: 'Starting point for CABG risk model'
   });
   
-  // Age effect (non-linear)
+  // Age effect (non-linear) - only applies when age > 60
   if (data.age) {
-    const ageFactor = (data.age - 60) * 0.05;
-    logit += ageFactor;
-    steps.push({
-      variable: 'Age',
-      value: data.age + ' years',
-      coefficient: 0.05,
-      calculation: `(${data.age} - 60) × 0.05`,
-      contribution: ageFactor.toFixed(3),
-      description: 'Age > 60 increases risk linearly'
-    });
+    if (data.age > 60) {
+      const ageFactor = (data.age - 60) * 0.05;
+      logit += ageFactor;
+      steps.push({
+        variable: 'Age',
+        value: data.age + ' years',
+        coefficient: 0.05,
+        calculation: `(${data.age} - 60) × 0.05`,
+        contribution: ageFactor.toFixed(3),
+        description: 'Age > 60 increases risk linearly'
+      });
+    } else {
+      // Age <= 60: no age penalty (baseline risk)
+      steps.push({
+        variable: 'Age',
+        value: data.age + ' years',
+        coefficient: 0.0,
+        calculation: 'Age ≤ 60 (no penalty)',
+        contribution: '0.000',
+        description: 'Age ≤ 60: baseline risk (no age penalty)'
+      });
+    }
     
     if (data.age > 75) {
       logit += 0.3;
@@ -164,12 +176,12 @@ function calculateCABGMortalityDetailed(data) {
     }
   }
   
-  // Diabetes
-  if (data.diabetes) {
+  // Diabetes - check if diabetes exists and is not "No"
+  if (data.diabetes && data.diabetes.toString().toLowerCase() !== 'no') {
     logit += 0.2;
     steps.push({
       variable: 'Diabetes',
-      value: 'Yes',
+      value: data.diabetes,
       coefficient: 0.2,
       contribution: 0.2,
       description: 'Diabetes increases wound infection and recovery time'
@@ -220,18 +232,18 @@ function calculateCABGMortalityDetailed(data) {
     }
   }
   
-  // Emergency status
-  if (data.priority?.toLowerCase() === 'emergency' || 
-      data.priority?.toLowerCase() === 'emergent') {
+  // Emergency status - handle various formats including "Emergent Salvage"
+  const priorityLower = data.priority?.toLowerCase() || '';
+  if (priorityLower.includes('emergency') || priorityLower.includes('emergent')) {
     logit += 1.0;
     steps.push({
       variable: 'Surgical Priority',
-      value: 'Emergency',
+      value: data.priority || 'Emergency',
       coefficient: 1.0,
       contribution: 1.0,
       description: 'Emergency surgery - unstable patient'
     });
-  } else if (data.priority?.toLowerCase() === 'urgent') {
+  } else if (priorityLower === 'urgent') {
     logit += 0.4;
     steps.push({
       variable: 'Surgical Priority',
@@ -242,8 +254,9 @@ function calculateCABGMortalityDetailed(data) {
     });
   }
   
-  // Reoperation
-  if (data.reoperation || data.priorCardiacSurgery) {
+  // Reoperation - check multiple fields including surgeryIncidence
+  if (data.reoperation || data.priorCardiacSurgery || data.previousCABG || data.previousValve ||
+      (data.surgeryIncidence && data.surgeryIncidence.toLowerCase().includes('reop'))) {
     logit += 0.6;
     steps.push({
       variable: 'Reoperation',
@@ -301,16 +314,27 @@ function calculateCABGMortalityDetailed(data) {
     }
   }
   
-  // Recent MI
-  if (data.recentMI || data.miTiming === 'within 24 hours') {
-    logit += 0.5;
-    steps.push({
-      variable: 'Recent MI',
-      value: 'Yes',
-      coefficient: 0.5,
-      contribution: 0.5,
-      description: 'Myocardial infarction within 24 hours'
-    });
+  // Recent MI - only apply penalty for MI within 21 days
+  // MI > 21 days ago does NOT increase risk significantly in STS models
+  const miTimingLower = data.miTiming?.toLowerCase() || '';
+  if (data.recentMI || 
+      miTimingLower.includes('≤ 6 hrs') || 
+      miTimingLower.includes('≤6 hrs') ||
+      miTimingLower.includes('<24') ||
+      miTimingLower.includes('1 to 7 days') ||
+      miTimingLower.includes('8 to 21 days')) {
+    // Only count if within 21 days - "> 21 days" does not trigger penalty
+    if (!miTimingLower.includes('> 21 days') && !miTimingLower.includes('>21 days')) {
+      const miPenalty = (miTimingLower.includes('≤ 6 hrs') || miTimingLower.includes('≤6 hrs')) ? 0.7 : 0.5;
+      logit += miPenalty;
+      steps.push({
+        variable: 'Recent MI',
+        value: data.miTiming || 'Yes',
+        coefficient: miPenalty,
+        contribution: miPenalty,
+        description: 'Myocardial infarction within 21 days'
+      });
+    }
   }
   
   // Cardiogenic Shock
@@ -336,6 +360,21 @@ function calculateCABGMortalityDetailed(data) {
       description: 'Requires mechanical circulatory support'
     });
   }
+  
+  // Left main disease (≥50% stenosis)
+  if (data.leftMainStenosis || data.leftMainDisease) {
+    logit += 0.5;
+    steps.push({
+      variable: 'Left Main Stenosis',
+      value: '≥50%',
+      coefficient: 0.5,
+      contribution: 0.5,
+      description: 'Left main coronary artery disease - high risk anatomy'
+    });
+  }
+  
+  // Note: Three-vessel disease is typically not a separate risk factor in STS models
+  // as it's part of the procedure indication itself
   
   // Calculate total
   steps.push({
@@ -407,16 +446,27 @@ function calculateAVRMortalityDetailed(data) {
   });
   
   if (data.age) {
-    const ageFactor = (data.age - 60) * 0.06;
-    logit += ageFactor;
-    steps.push({
-      variable: 'Age',
-      value: data.age + ' years',
-      coefficient: 0.06,
-      calculation: `(${data.age} - 60) × 0.06`,
-      contribution: ageFactor.toFixed(3),
-      description: 'Age > 60 increases risk'
-    });
+    if (data.age > 60) {
+      const ageFactor = (data.age - 60) * 0.06;
+      logit += ageFactor;
+      steps.push({
+        variable: 'Age',
+        value: data.age + ' years',
+        coefficient: 0.06,
+        calculation: `(${data.age} - 60) × 0.06`,
+        contribution: ageFactor.toFixed(3),
+        description: 'Age > 60 increases risk'
+      });
+    } else {
+      steps.push({
+        variable: 'Age',
+        value: data.age + ' years',
+        coefficient: 0.0,
+        calculation: 'Age ≤ 60 (no penalty)',
+        contribution: '0.000',
+        description: 'Age ≤ 60: baseline risk (no age penalty)'
+      });
+    }
     if (data.age > 80) {
       logit += 0.4;
       steps.push({
@@ -548,7 +598,9 @@ function calculateAVRMortality(data) {
   
   // Similar risk factors as CABG but different coefficients
   if (data.age) {
-    logit += (data.age - 60) * 0.06;
+    if (data.age > 60) {
+      logit += (data.age - 60) * 0.06;
+    }
     if (data.age > 80) logit += 0.4;
   }
   
@@ -598,7 +650,7 @@ function calculateMVRepairMortalityDetailed(data) {
 function calculateMVRMortality(data) {
   let logit = -5.5; // Baseline for MVR
   
-  if (data.age) logit += (data.age - 60) * 0.055;
+  if (data.age && data.age > 60) logit += (data.age - 60) * 0.055;
   if (data.gender?.toLowerCase() === 'female') logit += 0.2;
   if (data.ejectionFraction && data.ejectionFraction < 30) logit += 1.0;
   if (data.dialysis) logit += 1.4;
@@ -622,7 +674,7 @@ function calculateMVRMorbidity(data) {
 function calculateMVRepairMortality(data) {
   let logit = -6.2; // Lower baseline - repair has better outcomes
   
-  if (data.age) logit += (data.age - 60) * 0.045;
+  if (data.age && data.age > 60) logit += (data.age - 60) * 0.045;
   if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.7;
   if (data.priority?.toLowerCase() === 'emergency') logit += 1.1;
   if (data.endocarditis) logit += 0.7;

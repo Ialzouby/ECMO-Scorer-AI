@@ -335,26 +335,28 @@ Return ONLY the JSON object. Extract everything possible, use null for missing d
     
     mathTable += `\n\n**Risk Category:** ${mathResult.riskCategory}  \n**Calculation Confidence:** ${mathResult.confidence}\n\n`;
     
-    // Add detailed step-by-step calculation AFTER the summary table
-    let logitSum = 0;
-    let finalProbability = null;
-    
-    if (mathResult.detailedSteps && mathResult.detailedSteps.length > 0) {
-      mathTable += `---\n\n### 📊 DETAILED CALCULATION BREAKDOWN (MORTALITY MODEL)\n\n`;
-      mathTable += `This section shows the step-by-step mathematical calculation for **Operative Mortality** using logistic regression.\n\n`;
-      mathTable += `**Formula:** P(mortality) = 1 / (1 + e^(-logit))  \n**Where:** logit = intercept + Σ(coefficient × risk_factor)\n\n`;
-      mathTable += `---\n\n`;
-      mathTable += `#### Step 1: Risk Factor Contributions to Logit\n\n`;
-      mathTable += `| Step | Risk Factor | Patient Value | Coefficient | Calculation | Logit Contribution |\n|---|---|---|---|---|---|\n`;
+    // Helper function to format detailed calculation steps for any outcome
+    function formatDetailedCalculation(steps, outcomeName, outcomeIcon) {
+      if (!steps || steps.length === 0) return '';
+      
+      let output = `---\n\n### ${outcomeIcon} DETAILED CALCULATION: ${outcomeName}\n\n`;
+      output += `This section shows the step-by-step mathematical calculation for **${outcomeName}** using logistic regression.\n\n`;
+      output += `**Formula:** P(outcome) = 1 / (1 + e^(-logit))  \n**Where:** logit = intercept + Σ(coefficient × risk_factor)\n\n`;
+      output += `---\n\n`;
+      output += `#### Risk Factor Contributions\n\n`;
+      output += `| Step | Risk Factor | Patient Value | Coefficient | Calculation | Logit Contribution |\n|---|---|---|---|---|---|\n`;
       
       let stepNum = 1;
-      mathResult.detailedSteps.forEach(s => {
+      let logitSum = 0;
+      let finalProbability = null;
+      
+      steps.forEach(s => {
         // Skip the final transformation steps for now
         if (s.variable.includes('TOTAL LOGIT')) {
           logitSum = parseFloat(s.contribution);
           return;
         }
-        if (s.variable.includes('LOGISTIC TRANSFORMATION') || s.variable.includes('FINAL MORTALITY')) {
+        if (s.variable.includes('LOGISTIC TRANSFORMATION') || s.variable.includes('FINAL')) {
           if (s.variable.includes('LOGISTIC TRANSFORMATION')) {
             finalProbability = parseFloat(s.contribution);
           }
@@ -369,28 +371,67 @@ Return ONLY the JSON object. Extract everything possible, use null for missing d
           calcDisplay = `Intercept = ${s.contribution}`;
         }
         
-        mathTable += `| ${stepNum} | **${s.variable}** | ${s.value || 'N/A'} | ${s.coefficient} | ${calcDisplay} | **${s.contribution}** |\n`;
+        output += `| ${stepNum} | **${s.variable}** | ${s.value || 'N/A'} | ${s.coefficient} | ${calcDisplay} | **${s.contribution}** |\n`;
         stepNum++;
       });
       
-      // Add remaining steps
-      const totalLogitStep = mathResult.detailedSteps.find(s => s.variable.includes('TOTAL LOGIT'));
+      // Add summary steps
+      const totalLogitStep = steps.find(s => s.variable.includes('TOTAL LOGIT'));
       if (totalLogitStep) {
-        mathTable += `\n#### Step 2: Calculate Total Logit (Sum)\n\n`;
-        mathTable += `**Total Logit = ${totalLogitStep.contribution}**\n\n`;
+        output += `\n#### Total Logit (Sum of All Contributions)\n\n`;
+        output += `**Total Logit = ${totalLogitStep.contribution}**\n\n`;
       }
       
-      const logisticStep = mathResult.detailedSteps.find(s => s.variable.includes('LOGISTIC TRANSFORMATION'));
+      const logisticStep = steps.find(s => s.variable.includes('LOGISTIC TRANSFORMATION'));
       if (logisticStep) {
-        mathTable += `#### Step 3: Logistic Transformation\n\n`;
-        mathTable += `**P = 1 / (1 + e^(-${logitSum.toFixed(3)})) = ${finalProbability ? finalProbability.toFixed(6) : logisticStep.contribution}**\n\n`;
+        output += `#### Logistic Transformation\n\n`;
+        output += `**P = 1 / (1 + e^(-${logitSum.toFixed(3)})) = ${finalProbability ? finalProbability.toFixed(6) : logisticStep.contribution}**\n\n`;
       }
       
-      const finalStep = mathResult.detailedSteps.find(s => s.variable.includes('FINAL MORTALITY'));
+      const finalStep = steps.find(s => s.variable.includes('FINAL'));
       if (finalStep) {
-        mathTable += `#### Step 4: Convert to Percentage\n\n`;
-        mathTable += `**Operative Mortality Risk = ${finalStep.contribution}**\n\n`;
+        output += `#### Final Risk Estimate\n\n`;
+        output += `**${outcomeName} Risk = ${finalStep.contribution}**\n\n`;
       }
+      
+      return output;
+    }
+    
+    // Add detailed step-by-step calculations for ALL outcomes
+    if (mathResult.detailedSteps && mathResult.detailedSteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.detailedSteps, 'Operative Mortality', '💀');
+    }
+    
+    if (mathResult.morbiditySteps && mathResult.morbiditySteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.morbiditySteps, 'Morbidity & Mortality (PROMM)', '⚕️');
+    }
+    
+    if (mathResult.strokeSteps && mathResult.strokeSteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.strokeSteps, 'Stroke', '🧠');
+    }
+    
+    if (mathResult.renalFailureSteps && mathResult.renalFailureSteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.renalFailureSteps, 'Renal Failure', '🫘');
+    }
+    
+    if (mathResult.reoperationSteps && mathResult.reoperationSteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.reoperationSteps, 'Reoperation', '🔄');
+    }
+    
+    if (mathResult.prolongedVentilationSteps && mathResult.prolongedVentilationSteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.prolongedVentilationSteps, 'Prolonged Ventilation (>24 hrs)', '🫁');
+    }
+    
+    if (mathResult.deepSternalWoundInfectionSteps && mathResult.deepSternalWoundInfectionSteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.deepSternalWoundInfectionSteps, 'Deep Sternal Wound Infection', '🦠');
+    }
+    
+    if (mathResult.longHospitalStaySteps && mathResult.longHospitalStaySteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.longHospitalStaySteps, 'Long Hospital Stay (>14 days)', '🏥');
+    }
+    
+    if (mathResult.shortHospitalStaySteps && mathResult.shortHospitalStaySteps.length > 0) {
+      mathTable += formatDetailedCalculation(mathResult.shortHospitalStaySteps, 'Short Hospital Stay (<6 days)', '✨');
     }
     
     const stsForm = generateSTSFormHTML(structuredData);

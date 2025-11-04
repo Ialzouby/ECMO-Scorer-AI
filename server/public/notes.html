@@ -897,6 +897,123 @@ ${checkboxField('previousPCI', 'Previous PCI')}
       return cardHtml;
     }
     
+    // Special function to render AI Analysis with card layout
+    function renderAIAnalysisWithCards(text) {
+      // First convert markdown to HTML
+      let html = text;
+      
+      // Convert markdown tables to HTML tables FIRST
+      const tableRegex = /\|(.+?)\|\n\|[\s\-:|]+\|\n((?:\|.+?\|\n?)+)/g;
+      html = html.replace(tableRegex, (match, headerRow, bodyRows) => {
+        const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
+        const rows = bodyRows.trim().split('\n').map(row => 
+          row.split('|').map(cell => cell.trim()).filter(cell => cell)
+        ).filter(row => row.length > 0);
+        
+        let tableHtml = '<div class="overflow-x-auto my-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">';
+        tableHtml += '<thead class="bg-gray-50 dark:bg-gray-800"><tr>';
+        headers.forEach(header => {
+          const cleanHeader = header.replace(/\*\*/g, '');
+          tableHtml += `<th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">${cleanHeader}</th>`;
+        });
+        tableHtml += '</tr></thead>';
+        tableHtml += '<tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">';
+        rows.forEach(row => {
+          tableHtml += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-800">';
+          row.forEach(cell => {
+            const cleanCell = cell.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            tableHtml += `<td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">${cleanCell}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+        tableHtml += '</tbody></table></div>';
+        return tableHtml;
+      });
+      
+      // Convert headers
+      html = html.replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3">$2</h2>');
+      html = html.replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>');
+      
+      // Convert bold and italic
+      html = html.replace(/\*\*\*([^*]+)\*\*\*/gim, '<strong class="font-bold">$1</strong>');
+      html = html.replace(/\*\*([^*]+)\*\*/gim, '<strong class="font-bold">$1</strong>');
+      html = html.replace(/\*([^*]+)\*/gim, '<em>$1</em>');
+      
+      // Convert line breaks
+      html = html.replace(/\n\n/g, '</p><p class="mb-3">');
+      html = html.replace(/\n/g, '<br>');
+      
+      // Convert lists
+      html = html.replace(/^\- (.*)$/gim, '<li class="ml-4">• $1</li>');
+      html = html.replace(/^• (.*)$/gim, '<li class="ml-4">• $1</li>');
+      
+      // Wrap in paragraph tags
+      html = '<p class="mb-3">' + html + '</p>';
+      
+      // Split content by h3 headers to create cards
+      const sections = html.split(/<h3[^>]*>/);
+      
+      if (sections.length <= 1) {
+        // No sections found, return as is
+        return html;
+      }
+      
+      let cardHtml = '<div class="space-y-4">';
+      
+      // First section is before any h3 (usually empty or intro text)
+      if (sections[0].trim()) {
+        cardHtml += `<div class="mb-6">${sections[0]}</div>`;
+      }
+      
+      // Define icons for each section
+      const sectionIcons = {
+        'MANUAL CALCULATION REVIEW': '📊',
+        'YOUR INDEPENDENT ASSESSMENT': '🔍',
+        'COMPARISON & DISCREPANCY ANALYSIS': '⚖️',
+        'KEY RISK FACTORS & RECOMMENDATIONS': '💡',
+        'COMPARISON': '⚖️',
+        'DISCREPANCY': '⚖️',
+        'RISK FACTORS': '💡',
+        'RECOMMENDATIONS': '💡'
+      };
+      
+      // Process each section as a card
+      for (let i = 1; i < sections.length; i++) {
+        const section = sections[i];
+        const headerMatch = section.match(/^(.+?)<\/h3>(.*)/s);
+        
+        if (headerMatch) {
+          const headerText = headerMatch[1];
+          const content = headerMatch[2];
+          
+          // Find matching icon
+          let icon = '📋'; // default icon
+          for (const [key, value] of Object.entries(sectionIcons)) {
+            if (headerText.toUpperCase().includes(key)) {
+              icon = value;
+              break;
+            }
+          }
+          
+          cardHtml += `
+            <div class="card p-6 hover:shadow-lg transition-shadow duration-200 border-l-4 border-primary-500">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                <span class="text-2xl">${icon}</span>
+                <span>${headerText}</span>
+              </h3>
+              <div class="text-sm text-gray-700 dark:text-gray-300 prose prose-sm dark:prose-invert max-w-none">
+                ${content}
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      cardHtml += '</div>';
+      return cardHtml;
+    }
+    
     // Simple markdown to HTML converter
     function markdownToHtml(text) {
       // Convert markdown tables to HTML tables FIRST (before other conversions)
@@ -1283,8 +1400,8 @@ ${checkboxField('previousPCI', 'Previous PCI')}
             console.warn('⚠️ No structuredData in response');
           }
           
-          // Display AI analysis tab - Tab 3 content
-          document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab3Content);
+          // Display AI analysis tab - Tab 3 content with card layout
+          document.getElementById('ai-analysis-text').innerHTML = renderAIAnalysisWithCards(tab3Content);
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
           
@@ -1414,8 +1531,8 @@ ${checkboxField('previousPCI', 'Previous PCI')}
             attachSaveSTSButton();
           }
           
-          // Update AI analysis tab - Tab 3 content
-          document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab3Content);
+          // Update AI analysis tab - Tab 3 content with card layout
+          document.getElementById('ai-analysis-text').innerHTML = renderAIAnalysisWithCards(tab3Content);
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
           

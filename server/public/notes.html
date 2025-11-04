@@ -772,8 +772,87 @@ ${checkboxField('previousPCI', 'Previous PCI')}
     
     // Special function to render Manual Calculations with card layout
     function renderManualCalculationsWithCards(text) {
-      // First convert markdown to HTML
-      let html = markdownToHtml(text);
+      // Convert markdown tables to HTML with enhanced styling for manual calc tab
+      // Fixed regex to properly capture all body rows
+      const tableRegex = /\|(.+)\|\n\|[\s\-:|]+\|\n((?:\|.+\|\n?)+)/g;
+      
+      text = text.replace(tableRegex, (match, headerRow, bodyRows) => {
+        console.log('🔧 Processing table in manual calc...');
+        console.log('Full match length:', match.length);
+        console.log('Header row:', headerRow);
+        console.log('Body rows (first 200 chars):', bodyRows.substring(0, 200));
+        console.log('Body rows (full):', bodyRows);
+        
+        // Parse header
+        const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
+        
+        // Parse body rows - split by newline and process each
+        const rows = bodyRows.trim().split('\n').map(row => {
+          // Remove leading/trailing pipes and split
+          const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell);
+          return cells;
+        }).filter(row => row.length > 0);
+        
+        console.log('Parsed headers:', headers.length, headers);
+        console.log('Parsed rows:', rows.length);
+        if (rows.length > 0) {
+          console.log('First row cells:', rows[0]);
+          console.log('Last row cells:', rows[rows.length - 1]);
+        }
+        
+        // Build HTML table with better styling for calculations
+        let tableHtml = '<div class="overflow-x-auto my-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">';
+        tableHtml += '<table class="min-w-full divide-y divide-gray-300 dark:divide-gray-600">';
+        
+        // Add header with bold styling
+        tableHtml += '<thead class="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-700 dark:to-primary-800"><tr>';
+        headers.forEach((header, idx) => {
+          const cleanHeader = header.replace(/\*\*/g, '');
+          tableHtml += `<th class="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider ${idx > 0 ? 'border-l border-primary-500' : ''}">${cleanHeader}</th>`;
+        });
+        tableHtml += '</tr></thead>';
+        
+        // Add body with alternating row colors
+        tableHtml += '<tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">';
+        rows.forEach((row, rowIdx) => {
+          const bgClass = rowIdx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800';
+          tableHtml += `<tr class="${bgClass} hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">`;
+          row.forEach((cell, cellIdx) => {
+            const cleanCell = cell.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900 dark:text-white">$1</strong>');
+            const textAlign = cellIdx === 0 ? 'text-center font-semibold' : 'text-left';
+            tableHtml += `<td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 ${textAlign} ${cellIdx > 0 ? 'border-l border-gray-200 dark:border-gray-700' : ''}">${cleanCell}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+        tableHtml += '</tbody></table></div>';
+        
+        console.log('✅ Table HTML generated');
+        return tableHtml;
+      });
+      
+      // Now do other markdown conversions WITHOUT re-processing tables
+      let html = text;
+      
+      // Convert headers
+      html = html.replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>');
+      html = html.replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>');
+      
+      // Convert bold text
+      html = html.replace(/\*\*\*([^*]+)\*\*\*/gim, '<strong class="font-bold">$1</strong>');
+      html = html.replace(/\*\*([^*]+)\*\*/gim, '<strong class="font-bold">$1</strong>');
+      html = html.replace(/\*([^*]+)\*/gim, '<em>$1</em>');
+      
+      // Convert line breaks
+      html = html.replace(/\n\n/g, '</p><p class="mb-3">');
+      html = html.replace(/\n/g, '<br>');
+      
+      // Convert unordered lists
+      html = html.replace(/^\- (.*)$/gim, '<li class="ml-4">• $1</li>');
+      html = html.replace(/^• (.*)$/gim, '<li class="ml-4">• $1</li>');
+      
+      // Wrap in paragraph tags
+      html = '<p class="mb-3">' + html + '</p>';
       
       // Split content by h3 headers to create cards for each step
       const sections = html.split(/<h3[^>]*>/);

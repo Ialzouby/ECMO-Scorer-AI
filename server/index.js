@@ -1,48 +1,43 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
-const dotenv = require('dotenv');
+const path = require('path');
+require('dotenv').config();
 
-dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 8080;
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// FORCE NO CACHE
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+});
+
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API Routes
 const ecmoRoute = require('./routes/ecmo');
 const stsRoute = require('./routes/sts');
 const surveyRoute = require('./routes/survey');
 
-const app = express();
-
-// ✅ Serve frontend HTML + assets (MUST come before catch-all)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ✅ CORS Setup
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-}));
-app.options('*', cors());
-
-// ✅ Parse JSON
-app.use(express.json());
-
-// ✅ API Routes
 app.use('/api/ecmo-score', ecmoRoute);
 app.use('/api/sts-score', stsRoute);
 app.use('/api/survey', surveyRoute);
 
-// ✅ Serve notes.html
+// Root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'notes.html'));
 });
 
-// ✅ 405 Catch-all (move this LAST!)
-app.all('*', (req, res) => {
-  console.log(`🚫 Method not allowed: ${req.method} on ${req.originalUrl}`);
-  res.status(405).send(`🚫 Method Not Allowed: ${req.method} on ${req.originalUrl}`);
-});
-
-// ✅ Start server
-const PORT = process.env.PORT || 3001;
+// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Backend running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log('NO CACHE MODE - All responses force refresh');
 });

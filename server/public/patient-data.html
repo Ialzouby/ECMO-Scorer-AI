@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STS Patient Data Form</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #003366;
+      margin-bottom: 15px;
+      font-size: 22px;
+      border-bottom: 3px solid #003366;
+      padding-bottom: 8px;
+    }
+    
+    .form-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+    
+    .sts-main-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      table-layout: fixed;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-main-table tr {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-main-table td {
+      margin: 0;
+      padding: 0 10px;
+      vertical-align: top;
+      width: 33.33%;
+    }
+    
+    .sts-col-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-col-table tr {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-col-table td {
+      margin: 0;
+      padding: 3px 5px;
+      vertical-align: middle;
+    }
+    
+    .sts-label {
+      font-weight: 500;
+      font-size: 9px;
+      width: 38%;
+      padding-right: 6px;
+      white-space: nowrap;
+    }
+    
+    .sts-value {
+      width: 62%;
+    }
+    
+    .sts-section {
+      background: #e0e0e0;
+      padding: 6px 8px;
+      font-weight: 600;
+      font-size: 10px;
+      border: 1px solid #999;
+      margin: 0;
+    }
+    
+    .sts-input, .sts-select {
+      padding: 3px 5px;
+      border: 1px solid #666;
+      border-radius: 2px;
+      font-size: 9px;
+      width: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    .sts-checkbox-label {
+      font-size: 9px;
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+    
+    .sts-checkbox-label input {
+      margin-right: 5px;
+    }
+    
+    .highlight {
+      background-color: #fffacd !important;
+    }
+    
+    .summary {
+      margin-top: 20px;
+      padding: 12px;
+      background: #e6f2ff;
+      border-left: 4px solid #003366;
+      font-size: 11px;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      color: #003366;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="notes.html" class="back-link">← Back to Main Tool</a>
+    <h1>STS Risk Calculator - Patient Data Form</h1>
+    <div class="form-wrapper" id="formWrapper"></div>
+    <div class="summary">
+      <strong>📊 Data Summary:</strong> <span id="fieldCount">0</span> fields filled. Yellow highlights = filled values.
+    </div>
+  </div>
+
+  <script>
+    // Get patient data from URL parameter or localStorage
+    function getPatientData() {
+      // Try localStorage first (most recent)
+      const stored = localStorage.getItem('stsPatientData');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          console.log('✅ Loaded patient data from localStorage:', Object.keys(data).length, 'fields');
+          return data;
+        } catch (e) {
+          console.error('❌ Error parsing stored data:', e);
+        }
+      }
+      
+      // Try URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const dataParam = urlParams.get('data');
+      
+      if (dataParam) {
+        try {
+          return JSON.parse(decodeURIComponent(dataParam));
+        } catch (e) {
+          console.error('Error parsing URL data:', e);
+        }
+      }
+      
+      console.warn('⚠️ No patient data found');
+      return null;
+    }
+    
+    // Helper functions
+    function getSelected(field, value, data) {
+      return data[field] === value ? 'selected' : '';
+    }
+    
+    function getChecked(field, data) {
+      return data[field] ? 'checked' : '';
+    }
+    
+    function getValue(field, data) {
+      const val = data[field];
+      return val !== null && val !== undefined ? val : '';
+    }
+    
+    function highlight(field, data) {
+      return data[field] && data[field] !== false && data[field] !== '' 
+        ? 'background-color: #fffacd;' : '';
+    }
+    
+    function row(label, input) {
+      return `<tr><td class="sts-label">${label}</td><td class="sts-value">${input}</td></tr>`;
+    }
+    
+    function select(field, options, data) {
+      const opts = options.map(opt => {
+        const val = typeof opt === 'string' ? opt : opt.value;
+        const text = typeof opt === 'string' ? opt : opt.text;
+        return `<option value="${val}" ${getSelected(field, val, data)}>${text}</option>`;
+      }).join('');
+      const hlStyle = highlight(field, data);
+      return `<select class="sts-select" style="${hlStyle}" disabled><option value="">Select</option>${opts}</select>`;
+    }
+    
+    function input(field, type, data) {
+      const hlStyle = highlight(field, data);
+      return `<input type="${type}" class="sts-input" style="${hlStyle}" value="${getValue(field, data)}" disabled />`;
+    }
+    
+    function checkbox(field, label, data) {
+      return `<tr><td colspan="2"><label class="sts-checkbox-label"><input type="checkbox" ${getChecked(field, data)} disabled /> ${label}</label></td></tr>`;
+    }
+    
+    function section(title) {
+      return `<tr><td colspan="2" class="sts-section">${title}</td></tr>`;
+    }
+    
+    function generateForm(data) {
+      if (!data) {
+        document.getElementById('formWrapper').innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No patient data available. Please go back and submit patient notes first.</p>';
+        return;
+      }
+      
+      const html = `<table class="sts-main-table"><tr>
+<td><table class="sts-col-table">
+${section('PLANNED SURGERY')}
+${row('Procedure Type:', select('procedureType', ['Isolated CABG', 'Isolated AVR', 'Isolated MVR', 'AVR + CABG', 'MVR + CABG', 'MV Repair', 'MV Repair for Primary MR', 'MV Repair + CABG'], data))}
+${row('Surgery Incidence:', select('surgeryIncidence', ['First CV surgery', 'ReOp#1', 'ReOp#2', 'ReOp#3', 'ReOp≥4'], data))}
+${row('Surgical Priority:', select('priority', ['Elective', 'Urgent', 'Emergent', 'Emergent Salvage'], data))}
+${section('DEMOGRAPHICS')}
+${row('Sex:', select('gender', ['Male', 'Female'], data))}
+${row('Age (years):', input('age', 'number', data))}
+${row('Height (cm):', input('height', 'number', data))}
+${row('Weight (kg):', input('weight', 'number', data))}
+${row('BMI (kg/m²):', input('bmi', 'number', data))}
+${row('Race:', input('race', 'text', data))}
+${row('Payor / Insurance:', input('payor', 'text', data))}
+${section('LABORATORY VALUES')}
+${row('Creatinine (mg/dL):', input('creatinine', 'number', data))}
+${row('Hematocrit (%):', input('hematocrit', 'number', data))}
+${row('WBC Count (10³/μL):', input('wbc', 'number', data))}
+${row('Platelet Count (cells/μL):', input('platelets', 'number', data))}
+${section('PREOPERATIVE MEDICATIONS')}
+${checkbox('medACEInhibitors', 'ACE Inhibitors/ARBs ≤ 48 hrs', data)}
+${checkbox('medGPInhibitor', 'GP IIb/IIIa Inhibitor ≤ 24 hrs', data)}
+${checkbox('medInotropes', 'Inotropes ≤ 48 hrs', data)}
+${checkbox('medSteroids', 'Steroids ≤ 24 hrs', data)}
+${checkbox('medADPInhibitors', 'ADP Inhibitors ≤ 5 days', data)}
+</table></td>
+<td><table class="sts-col-table">
+${section('RISK FACTORS / COMORBIDITIES')}
+${row('Diabetes:', select('diabetes', ['No', 'Yes, Diet Only', 'Yes, Oral', 'Yes, Insulin', 'Yes, Other SubQ', 'Yes, Other Control', 'Yes, Unknown Control'], data))}
+${checkbox('familyHxCAD', 'Family Hx of CAD', data)}
+${checkbox('hypertension', 'Hypertension', data)}
+${checkbox('liverDisease', 'Liver Disease', data)}
+${checkbox('mediastinalRadiation', 'Mediastinal Radiation', data)}
+${checkbox('unresponsiveState', 'Unresponsive State', data)}
+${checkbox('dialysis', 'Dialysis', data)}
+${checkbox('cancer', 'Cancer ≤ 5 yrs', data)}
+${checkbox('syncope', 'Syncope', data)}
+${checkbox('immunocompromised', 'Immunocompromised', data)}
+${row('Endocarditis:', select('endocarditis', ['No', 'Yes, treated', 'Yes, active', 'Yes, unknown'], data))}
+${row('Illicit Drug Use:', select('illicitDrugUse', ['No', 'Yes', 'Unknown'], data))}
+${row('Alcohol Use:', select('alcoholUse', ['None', '≤ 1 drink/week', '2-7 drinks/week', '≥ 8 drinks/week'], data))}
+${row('Tobacco Use:', select('tobaccoUse', ['Never smoker', 'Current smoker', 'Former smoker'], data))}
+${section('PULMONARY')}
+${row('Chronic Lung Disease:', select('chronicLungDisease', ['No', 'Mild', 'Moderate', 'Severe', 'Severity Unknown'], data))}
+${checkbox('recentPneumonia', 'Recent Pneumonia', data)}
+${checkbox('sleepApnea', 'Sleep Apnea', data)}
+${checkbox('homeOxygen', 'Home O₂', data)}
+${section('VASCULAR')}
+${row('Cerebrovascular Disease:', select('cerebrovascularDisease', ['No', 'CVA ≤ 30 days', 'CVA > 30 days', 'TIA', 'Other CVD'], data))}
+${checkbox('pvd', 'Peripheral Artery Disease', data)}
+${checkbox('priorCarotidSurgery', 'Prior Carotid Surgery', data)}
+${checkbox('rightCarotidStenosis', 'Right Carotid Sten. ≥ 80%', data)}
+${checkbox('leftCarotidStenosis', 'Left Carotid Sten. ≥ 80%', data)}
+${section('CARDIAC STATUS')}
+${row('Heart Failure:', select('heartFailure', ['None', 'Yes - Acute', 'Yes - Chronic', 'Yes - Both'], data))}
+${row('NYHA Classification:', select('nyhaClass', ['Class I', 'Class II', 'Class III', 'Class IV'], data))}
+${row('PreOp Mech Circ Support:', input('mechanicalSupport', 'text', data))}
+${row('Ejection Fraction (%):', input('ejectionFraction', 'number', data))}
+${checkbox('cardiogenicShock', 'Cardiogenic Shock', data)}
+${checkbox('resuscitation', 'Resuscitation ≤ 1hr', data)}
+</table></td>
+<td><table class="sts-col-table">
+${section('CORONARY ARTERY DISEASE')}
+${row('Primary Coronary Symptom:', select('primaryCoronarySymptom', ['No coronary symptoms', 'Stable Angina', 'Unstable Angina', 'Non-ST Elevation MI', 'STEMI'], data))}
+${row('Myocardial Infarction - When:', select('miTiming', ['No MI', '≤ 6 Hrs', '>6 Hrs but <24 Hrs', '1 to 7 Days', '8 to 21 Days', '> 21 Days'], data))}
+${row('No. of Diseased Vessels:', select('numberOfDiseasedVessels', ['None', 'One', 'Two', 'Three'], data))}
+${checkbox('leftMainStenosis', 'Left Main Sten. ≥ 50%', data)}
+${checkbox('proximalLADStenosis', 'Proximal LAD Sten. ≥ 70%', data)}
+${section('VALVE DISEASE')}
+${checkbox('aorticStenosis', 'Aortic Stenosis', data)}
+${checkbox('mitralStenosis', 'Mitral Stenosis', data)}
+${checkbox('aorticRootAbscess', 'Aortic Root Abscess', data)}
+${row('Aortic Regurgitation:', select('aorticRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe'], data))}
+${row('Mitral Regurgitation:', select('mitralRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe'], data))}
+${row('Tricuspid Regurgitation:', select('tricuspidRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe'], data))}
+${section('ARRHYTHMIA')}
+${row('Atrial Fibrillation:', select('atrialFibrillation', ['None', 'Remote', 'Recent'], data))}
+${row('Atrial Flutter:', select('atrialFlutter', ['None', 'Remote', 'Recent'], data))}
+${row('V. Tach / V. Fib:', select('ventricularArrhythmia', ['None', 'Remote', 'Recent'], data))}
+${section('PREVIOUS CARDIAC INTERVENTIONS')}
+${checkbox('previousCABG', 'Previous CABG', data)}
+${checkbox('previousValve', 'Previous Valve Surgery', data)}
+${checkbox('previousPCI', 'Previous PCI', data)}
+</table></td>
+</tr></table>`;
+      
+      document.getElementById('formWrapper').innerHTML = html;
+      
+      // Update summary
+      const count = Object.values(data).filter(v => v !== null && v !== undefined && v !== false && v !== '').length;
+      document.getElementById('fieldCount').textContent = count;
+    }
+    
+    // Initialize on page load
+    const patientData = getPatientData();
+    generateForm(patientData);
+  </script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STS Risk Calculator - Patient Data Form</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #003366;
+      margin-bottom: 20px;
+      font-size: 24px;
+      border-bottom: 3px solid #003366;
+      padding-bottom: 10px;
+    }
+    
+    .sts-wrapper {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      font-size: 9px;
+    }
+    
+    .sts-main-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+      padding: 0;
+      border-spacing: 0;
+      display: table;
+      table-layout: fixed;
+    }
+    
+    .sts-main-table tr {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-main-table td {
+      margin: 0;
+      padding: 0 8px;
+      vertical-align: top;
+      width: 33.33%;
+    }
+    
+    .sts-col-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+      padding: 0;
+      border-spacing: 0;
+      display: table;
+    }
+    
+    .sts-col-table tr {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-col-table td {
+      margin: 0;
+      padding: 2px 4px;
+      vertical-align: middle;
+    }
+    
+    .sts-label {
+      font-weight: 500;
+      font-size: 9px;
+      width: 38%;
+      padding-right: 4px;
+    }
+    
+    .sts-value {
+      width: 62%;
+    }
+    
+    .sts-section {
+      background: #e0e0e0;
+      padding: 4px 6px;
+      font-weight: 600;
+      font-size: 9px;
+      border: 1px solid #999;
+      margin: 0;
+    }
+    
+    .sts-input, .sts-select {
+      padding: 2px 4px;
+      border: 1px solid #666;
+      border-radius: 1px;
+      font-size: 9px;
+      width: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    .sts-checkbox-label {
+      font-size: 9px;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sts-checkbox-label input {
+      margin-right: 4px;
+    }
+    
+    .highlight {
+      background-color: #fffacd !important;
+    }
+    
+    .summary {
+      margin-top: 15px;
+      padding: 10px;
+      background: #e6f2ff;
+      border-left: 4px solid #003366;
+      font-size: 10px;
+    }
+    
+    .controls {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .controls button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      background: #003366;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .controls button:hover {
+      background: #004488;
+    }
+    
+    .controls input[type="file"] {
+      margin-left: 10px;
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>STS Risk Calculator - Patient Data Form</h1>
+    
+    <div class="controls">
+      <button onclick="loadSampleData()">Load Sample Data</button>
+      <button onclick="clearForm()">Clear Form</button>
+      <button onclick="exportData()">Export JSON</button>
+      <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)" style="display: inline-block; margin-left: 10px;">
+      <label for="fileInput" style="cursor: pointer; margin-left: 5px;">Import JSON</label>
+    </div>
+    
+    <div id="formContainer"></div>
+    
+    <div class="summary">
+      <strong>📊 Data Summary:</strong> <span id="fieldCount">0</span> fields filled. Yellow highlights = filled values.
+    </div>
+    
+    <div style="margin-top: 20px;">
+      <h3>Raw JSON Data:</h3>
+      <textarea id="jsonDisplay" readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    // Sample data structure
+    let patientData = {
+      // PLANNED SURGERY
+      procedureType: null,
+      surgeryIncidence: null,
+      priority: null,
+      
+      // DEMOGRAPHICS
+      age: null,
+      gender: null,
+      height: null,
+      weight: null,
+      bmi: null,
+      race: null,
+      payor: null,
+      
+      // LABORATORY
+      creatinine: null,
+      hematocrit: null,
+      wbc: null,
+      platelets: null,
+      
+      // PREOP MEDICATIONS
+      medACEInhibitors: false,
+      medGPInhibitor: false,
+      medInotropes: false,
+      medSteroids: false,
+      medADPInhibitors: false,
+      
+      // RISK FACTORS
+      diabetes: null,
+      familyHxCAD: false,
+      hypertension: false,
+      liverDisease: false,
+      mediastinalRadiation: false,
+      unresponsiveState: false,
+      dialysis: false,
+      cancer: false,
+      syncope: false,
+      immunocompromised: false,
+      endocarditis: null,
+      illicitDrugUse: null,
+      alcoholUse: null,
+      tobaccoUse: null,
+      
+      // PULMONARY
+      chronicLungDisease: null,
+      recentPneumonia: false,
+      sleepApnea: false,
+      homeOxygen: false,
+      
+      // VASCULAR
+      cerebrovascularDisease: null,
+      pvd: false,
+      priorCarotidSurgery: false,
+      rightCarotidStenosis: false,
+      leftCarotidStenosis: false,
+      
+      // CARDIAC STATUS
+      heartFailure: null,
+      nyhaClass: null,
+      mechanicalSupport: null,
+      ejectionFraction: null,
+      cardiogenicShock: false,
+      resuscitation: false,
+      
+      // CAD
+      primaryCoronarySymptom: null,
+      miTiming: null,
+      numberOfDiseasedVessels: null,
+      leftMainStenosis: false,
+      proximalLADStenosis: false,
+      
+      // VALVE
+      aorticStenosis: false,
+      mitralStenosis: false,
+      aorticRootAbscess: false,
+      aorticRegurgitation: null,
+      mitralRegurgitation: null,
+      tricuspidRegurgitation: null,
+      
+      // ARRHYTHMIA
+      atrialFibrillation: null,
+      atrialFlutter: null,
+      ventricularArrhythmia: null,
+      
+      // PREVIOUS INTERVENTIONS
+      previousCABG: false,
+      previousValve: false,
+      previousPCI: false
+    };
+
+    // Helper functions
+    function getSelected(field, value) {
+      return patientData[field] === value ? 'selected' : '';
+    }
+    
+    function getChecked(field) {
+      return patientData[field] ? 'checked' : '';
+    }
+    
+    function getValue(field) {
+      return patientData[field] || '';
+    }
+    
+    function highlight(field) {
+      return patientData[field] !== null && patientData[field] !== false && patientData[field] !== '' 
+        ? 'background-color: #fffacd;' : '';
+    }
+    
+    function row(label, input) {
+      return `<tr><td class="sts-label">${label}</td><td class="sts-value">${input}</td></tr>`;
+    }
+    
+    function select(field, options, highlightStyle = '') {
+      const opts = options.map(opt => {
+        const val = typeof opt === 'string' ? opt : opt.value;
+        const text = typeof opt === 'string' ? opt : opt.text;
+        return `<option value="${val}" ${getSelected(field, val)}>${text}</option>`;
+      }).join('');
+      const hlStyle = highlightStyle || highlight(field);
+      return `<select class="sts-select" style="${hlStyle}" disabled><option value="">Select</option>${opts}</select>`;
+    }
+    
+    function input(field, type = 'text', highlightStyle = '') {
+      const hlStyle = highlightStyle || highlight(field);
+      return `<input type="${type}" class="sts-input" style="${hlStyle}" value="${getValue(field)}" disabled />`;
+    }
+    
+    function checkbox(field, label) {
+      return `<tr><td colspan="2"><label class="sts-checkbox-label"><input type="checkbox" ${getChecked(field)} disabled /> ${label}</label></td></tr>`;
+    }
+    
+    function section(title) {
+      return `<tr><td colspan="2" class="sts-section">${title}</td></tr>`;
+    }
+    
+    function generateForm() {
+      const html = `<table class="sts-main-table"><tr>
+<td><table class="sts-col-table">
+${section('PLANNED SURGERY')}
+${row('Procedure Type:', select('procedureType', ['Isolated CABG', 'Isolated AVR', 'Isolated MVR', 'AVR + CABG', 'MVR + CABG', 'MV Repair', 'MV Repair for Primary MR', 'MV Repair + CABG']))}
+${row('Surgery Incidence:', select('surgeryIncidence', ['First CV surgery', 'ReOp#1', 'ReOp#2', 'ReOp#3', 'ReOp≥4']))}
+${row('Surgical Priority:', select('priority', ['Elective', 'Urgent', 'Emergent', 'Emergent Salvage']))}
+${section('DEMOGRAPHICS')}
+${row('Sex:', select('gender', ['Male', 'Female']))}
+${row('Age (years):', input('age', 'number'))}
+${row('Height (cm):', input('height', 'number'))}
+${row('Weight (kg):', input('weight', 'number'))}
+${row('BMI (kg/m²):', input('bmi', 'number'))}
+${row('Race:', input('race'))}
+${row('Payor / Insurance:', input('payor'))}
+${section('LABORATORY VALUES')}
+${row('Creatinine (mg/dL):', input('creatinine', 'number'))}
+${row('Hematocrit (%):', input('hematocrit', 'number'))}
+${row('WBC Count (10³/μL):', input('wbc', 'number'))}
+${row('Platelet Count (cells/μL):', input('platelets', 'number'))}
+${section('PREOPERATIVE MEDICATIONS')}
+${checkbox('medACEInhibitors', 'ACE Inhibitors/ARBs ≤ 48 hrs')}
+${checkbox('medGPInhibitor', 'GP IIb/IIIa Inhibitor ≤ 24 hrs')}
+${checkbox('medInotropes', 'Inotropes ≤ 48 hrs')}
+${checkbox('medSteroids', 'Steroids ≤ 24 hrs')}
+${checkbox('medADPInhibitors', 'ADP Inhibitors ≤ 5 days')}
+</table></td>
+<td><table class="sts-col-table">
+${section('RISK FACTORS / COMORBIDITIES')}
+${row('Diabetes:', select('diabetes', ['No', 'Yes, Diet Only', 'Yes, Oral', 'Yes, Insulin', 'Yes, Other SubQ', 'Yes, Other Control', 'Yes, Unknown Control']))}
+${checkbox('familyHxCAD', 'Family Hx of CAD')}
+${checkbox('hypertension', 'Hypertension')}
+${checkbox('liverDisease', 'Liver Disease')}
+${checkbox('mediastinalRadiation', 'Mediastinal Radiation')}
+${checkbox('unresponsiveState', 'Unresponsive State')}
+${checkbox('dialysis', 'Dialysis')}
+${checkbox('cancer', 'Cancer ≤ 5 yrs')}
+${checkbox('syncope', 'Syncope')}
+${checkbox('immunocompromised', 'Immunocompromised')}
+${row('Endocarditis:', select('endocarditis', ['No', 'Yes, treated', 'Yes, active', 'Yes, unknown']))}
+${row('Illicit Drug Use:', select('illicitDrugUse', ['No', 'Yes', 'Unknown']))}
+${row('Alcohol Use:', select('alcoholUse', ['None', '≤ 1 drink/week', '2-7 drinks/week', '≥ 8 drinks/week']))}
+${row('Tobacco Use:', select('tobaccoUse', ['Never smoker', 'Current smoker', 'Former smoker']))}
+${section('PULMONARY')}
+${row('Chronic Lung Disease:', select('chronicLungDisease', ['No', 'Mild', 'Moderate', 'Severe', 'Severity Unknown']))}
+${checkbox('recentPneumonia', 'Recent Pneumonia')}
+${checkbox('sleepApnea', 'Sleep Apnea')}
+${checkbox('homeOxygen', 'Home O₂')}
+${section('VASCULAR')}
+${row('Cerebrovascular Disease:', select('cerebrovascularDisease', ['No', 'CVA ≤ 30 days', 'CVA > 30 days', 'TIA', 'Other CVD']))}
+${checkbox('pvd', 'Peripheral Artery Disease')}
+${checkbox('priorCarotidSurgery', 'Prior Carotid Surgery')}
+${checkbox('rightCarotidStenosis', 'Right Carotid Sten. ≥ 80%')}
+${checkbox('leftCarotidStenosis', 'Left Carotid Sten. ≥ 80%')}
+${section('CARDIAC STATUS')}
+${row('Heart Failure:', select('heartFailure', ['None', 'Yes - Acute', 'Yes - Chronic', 'Yes - Both']))}
+${row('NYHA Classification:', select('nyhaClass', ['Class I', 'Class II', 'Class III', 'Class IV']))}
+${row('PreOp Mech Circ Support:', input('mechanicalSupport'))}
+${row('Ejection Fraction (%):', input('ejectionFraction', 'number'))}
+${checkbox('cardiogenicShock', 'Cardiogenic Shock')}
+${checkbox('resuscitation', 'Resuscitation ≤ 1hr')}
+</table></td>
+<td><table class="sts-col-table">
+${section('CORONARY ARTERY DISEASE')}
+${row('Primary Coronary Symptom:', select('primaryCoronarySymptom', ['No coronary symptoms', 'Stable Angina', 'Unstable Angina', 'Non-ST Elevation MI', 'STEMI']))}
+${row('Myocardial Infarction - When:', select('miTiming', ['No MI', '≤ 6 Hrs', '>6 Hrs but <24 Hrs', '1 to 7 Days', '8 to 21 Days', '> 21 Days']))}
+${row('No. of Diseased Vessels:', select('numberOfDiseasedVessels', ['None', 'One', 'Two', 'Three']))}
+${checkbox('leftMainStenosis', 'Left Main Sten. ≥ 50%')}
+${checkbox('proximalLADStenosis', 'Proximal LAD Sten. ≥ 70%')}
+${section('VALVE DISEASE')}
+${checkbox('aorticStenosis', 'Aortic Stenosis')}
+${checkbox('mitralStenosis', 'Mitral Stenosis')}
+${checkbox('aorticRootAbscess', 'Aortic Root Abscess')}
+${row('Aortic Regurgitation:', select('aorticRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe']))}
+${row('Mitral Regurgitation:', select('mitralRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe']))}
+${row('Tricuspid Regurgitation:', select('tricuspidRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe']))}
+${section('ARRHYTHMIA')}
+${row('Atrial Fibrillation:', select('atrialFibrillation', ['None', 'Remote', 'Recent']))}
+${row('Atrial Flutter:', select('atrialFlutter', ['None', 'Remote', 'Recent']))}
+${row('V. Tach / V. Fib:', select('ventricularArrhythmia', ['None', 'Remote', 'Recent']))}
+${section('PREVIOUS CARDIAC INTERVENTIONS')}
+${checkbox('previousCABG', 'Previous CABG')}
+${checkbox('previousValve', 'Previous Valve Surgery')}
+${checkbox('previousPCI', 'Previous PCI')}
+</table></td>
+</tr></table>`;
+      
+      document.getElementById('formContainer').innerHTML = html;
+      updateSummary();
+    }
+    
+    function updateSummary() {
+      const count = Object.values(patientData).filter(v => v !== null && v !== undefined && v !== false && v !== '').length;
+      document.getElementById('fieldCount').textContent = count;
+      document.getElementById('jsonDisplay').value = JSON.stringify(patientData, null, 2);
+    }
+    
+    function loadSampleData() {
+      patientData = {
+        procedureType: 'Isolated CABG',
+        surgeryIncidence: 'First CV surgery',
+        priority: 'Elective',
+        age: 57,
+        gender: 'Female',
+        height: 165,
+        weight: 70,
+        bmi: 25.7,
+        race: 'Caucasian',
+        payor: 'Medicare',
+        creatinine: 5.7,
+        hematocrit: 33,
+        wbc: 6.4,
+        platelets: 140,
+        medACEInhibitors: true,
+        medGPInhibitor: false,
+        medInotropes: false,
+        medSteroids: false,
+        medADPInhibitors: true,
+        diabetes: 'Yes, Insulin',
+        familyHxCAD: true,
+        hypertension: true,
+        liverDisease: false,
+        mediastinalRadiation: false,
+        unresponsiveState: false,
+        dialysis: true,
+        cancer: false,
+        syncope: false,
+        immunocompromised: false,
+        endocarditis: 'No',
+        illicitDrugUse: 'No',
+        alcoholUse: 'None',
+        tobaccoUse: 'Never smoker',
+        chronicLungDisease: 'No',
+        recentPneumonia: false,
+        sleepApnea: false,
+        homeOxygen: false,
+        cerebrovascularDisease: 'No',
+        pvd: false,
+        priorCarotidSurgery: false,
+        rightCarotidStenosis: false,
+        leftCarotidStenosis: false,
+        heartFailure: 'Yes - Chronic',
+        nyhaClass: 'Class II',
+        mechanicalSupport: 'None',
+        ejectionFraction: 54,
+        cardiogenicShock: false,
+        resuscitation: false,
+        primaryCoronarySymptom: 'Non-ST Elevation MI',
+        miTiming: '> 21 Days',
+        numberOfDiseasedVessels: 'Three',
+        leftMainStenosis: false,
+        proximalLADStenosis: true,
+        aorticStenosis: false,
+        mitralStenosis: false,
+        aorticRootAbscess: false,
+        aorticRegurgitation: 'None',
+        mitralRegurgitation: 'Moderate',
+        tricuspidRegurgitation: 'Mild',
+        atrialFibrillation: 'None',
+        atrialFlutter: 'None',
+        ventricularArrhythmia: 'None',
+        previousCABG: false,
+        previousValve: false,
+        previousPCI: true
+      };
+      generateForm();
+    }
+    
+    function clearForm() {
+      patientData = Object.keys(patientData).reduce((acc, key) => {
+        if (typeof patientData[key] === 'boolean') {
+          acc[key] = false;
+        } else {
+          acc[key] = null;
+        }
+        return acc;
+      }, {});
+      generateForm();
+    }
+    
+    function exportData() {
+      const dataStr = JSON.stringify(patientData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'sts-patient-data.json';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    function loadFromFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          patientData = JSON.parse(e.target.result);
+          generateForm();
+        } catch (error) {
+          alert('Error loading file: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    // Initialize form on load
+    generateForm();
+  </script>
+</body>
+</html>

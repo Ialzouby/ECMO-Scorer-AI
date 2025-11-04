@@ -15,504 +15,145 @@ function generateSTSFormHTML(data) {
   const getValue = (field) => data[field] || '';
   const highlight = (field) => data[field] ? 'background-color: #fffacd;' : '';
   
+  // Helper functions for cleaner code
+  const row = (label, input) => `<tr><td class="sts-label">${label}</td><td class="sts-value">${input}</td></tr>`;
+  
+  const select = (field, options) => {
+    const opts = options.map(opt => {
+      const val = typeof opt === 'string' ? opt : opt.value;
+      const text = typeof opt === 'string' ? opt : opt.text;
+      return `<option value="${val}" ${getSelected(field, val)}>${text}</option>`;
+    }).join('');
+    return `<select class="sts-select" style="${highlight(field)}" disabled><option value="">Select</option>${opts}</select>`;
+  };
+  
+  const inputField = (field, type = 'text') => {
+    return `<input type="${type}" class="sts-input" style="${highlight(field)}" value="${getValue(field)}" disabled />`;
+  };
+  
+  const checkboxField = (field, label) => {
+    return `<tr><td colspan="2"><label class="sts-checkbox-label"><input type="checkbox" ${getChecked(field)} disabled /> ${label}</label></td></tr>`;
+  };
+  
+  const sectionHeader = (title) => {
+    return `<tr><td colspan="2" class="sts-section">${title}</td></tr>`;
+  };
+  
   return `
 <style>
-  .sts-container { font-family: Arial, sans-serif; font-size: 9px; width: 100%; margin: 0; padding: 0; line-height: 0; }
-  .sts-outer-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; padding: 0; border-spacing: 0; }
-  .sts-outer-table td { padding: 0 8px; vertical-align: top; width: 33.33%; margin: 0; }
-  .sts-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; padding: 0; border-spacing: 0; }
-  .sts-table td { padding: 3px 5px; vertical-align: middle; border: none; margin: 0; }
-  .sts-label { font-weight: 500; font-size: 9px; width: 35%; }
-  .sts-value { width: 65%; }
-  .sts-input, .sts-select { padding: 2px 4px; border: 1px solid #999; border-radius: 2px; font-size: 9px; width: 100%; }
-  .sts-section { background: #e8e8e8; padding: 5px; font-weight: 600; font-size: 10px; border: 1px solid #ccc; margin: 0; }
-  .sts-subsection { background: #f5f5f5; padding: 4px; font-weight: 600; font-size: 9px; }
-  .sts-checkbox-label { font-size: 9px; margin-left: 3px; }
+  .sts-wrapper { width: 100%; font-family: Arial, sans-serif; font-size: 9px; }
+  .sts-main-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; padding: 0; border-spacing: 0; }
+  .sts-main-table tr { margin: 0; padding: 0; }
+  .sts-main-table td { margin: 0; padding: 0 10px; vertical-align: top; width: 33.33%; }
+  .sts-col-table { width: 100%; border-collapse: collapse; margin: 0; padding: 0; border-spacing: 0; }
+  .sts-col-table tr { margin: 0; padding: 0; }
+  .sts-col-table td { margin: 0; padding: 3px 5px; vertical-align: middle; }
+  .sts-label { font-weight: 500; font-size: 9px; width: 38%; padding-right: 6px; }
+  .sts-value { width: 62%; }
+  .sts-section { background: #e0e0e0; padding: 6px 8px; font-weight: 600; font-size: 10px; border: 1px solid #999; margin: 0; }
+  .sts-input, .sts-select { padding: 3px 5px; border: 1px solid #666; border-radius: 2px; font-size: 9px; width: 100%; margin: 0; font-family: Arial, sans-serif; }
+  .sts-checkbox-label { font-size: 9px; margin: 0; padding: 0; display: block; }
+  .sts-checkbox-label input { margin-right: 5px; }
 </style>
 
-<div style="overflow-x: auto; width: 100%; margin: 0; padding: 0; min-width: 1200px; line-height: 0; font-size: 0;">
-<div class="sts-container" style="margin: 0; padding: 0; width: 100%; min-width: 1200px; line-height: 0; font-size: 0;"><table class="sts-outer-table" style="margin: 0; padding: 0; border-spacing: 0; border-collapse: collapse; line-height: normal; font-size: 9px; display: table;"><tr style="margin: 0; padding: 0; vertical-align: top;"><td style="margin: 0; padding: 0 8px; vertical-align: top; width: 33.33%;"><table class="sts-table" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;"><tr style="margin: 0; padding: 0;"><td colspan="2" class="sts-section" style="margin: 0; padding: 5px;">PLANNED SURGERY</td></tr>
-        
-        <tr>
-          <td class="sts-label">Procedure Type:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('procedureType')}" disabled>
-              <option ${getSelected('procedureType', null)}>Select</option>
-              <option ${getSelected('procedureType', 'Isolated CABG')}>Isolated CABG</option>
-              <option ${getSelected('procedureType', 'Isolated AVR')}>Isolated AVR</option>
-              <option ${getSelected('procedureType', 'Isolated MVR')}>Isolated MVR</option>
-              <option ${getSelected('procedureType', 'AVR + CABG')}>AVR + CABG</option>
-              <option ${getSelected('procedureType', 'MVR + CABG')}>MVR + CABG</option>
-              <option ${getSelected('procedureType', 'MV Repair')}>MV Repair - Any Etiology</option>
-              <option ${getSelected('procedureType', 'MV Repair for Primary MR')}>MV Repair for Primary MR</option>
-              <option ${getSelected('procedureType', 'MV Repair + CABG')}>MV Repair + CABG</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Surgery Incidence:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('surgeryIncidence')}" disabled>
-              <option ${getSelected('surgeryIncidence', null)}>Select</option>
-              <option ${getSelected('surgeryIncidence', 'First CV surgery')}>First CV surgery</option>
-              <option ${getSelected('surgeryIncidence', 'ReOp#1')}>ReOp#1 CV surgery</option>
-              <option ${getSelected('surgeryIncidence', 'ReOp#2')}>ReOp#2 CV surgery</option>
-              <option ${getSelected('surgeryIncidence', 'ReOp#3')}>ReOp#3 CV surgery</option>
-              <option ${getSelected('surgeryIncidence', 'ReOp≥4')}>ReOp≥4 CV surgery</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Surgical Priority:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('priority')}" disabled>
-              <option ${getSelected('priority', null)}>Select</option>
-              <option ${getSelected('priority', 'Elective')}>Elective</option>
-              <option ${getSelected('priority', 'Urgent')}>Urgent</option>
-              <option ${getSelected('priority', 'Emergent')}>Emergent</option>
-              <option ${getSelected('priority', 'Emergent Salvage')}>Emergent Salvage</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">DEMOGRAPHICS</td></tr>
-        
-        <tr>
-          <td class="sts-label">Sex:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('gender')}" disabled>
-              <option ${getSelected('gender', null)}>Select</option>
-              <option ${getSelected('gender', 'Male')}>Male</option>
-              <option ${getSelected('gender', 'Female')}>Female</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Age (years):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('age')}" value="${getValue('age')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Height (cm):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('height')}" value="${getValue('height')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Weight (kg):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('weight')}" value="${getValue('weight')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">BMI (kg/m²):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('bmi')}" value="${getValue('bmi')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Race:</td>
-          <td class="sts-value">
-            <input type="text" class="sts-input" style="${highlight('race')}" value="${getValue('race')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Payor / Insurance:</td>
-          <td class="sts-value">
-            <input type="text" class="sts-input" style="${highlight('payor')}" value="${getValue('payor')}" disabled />
-          </td>
-        </tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">LABORATORY VALUES</td></tr>
-        
-        <tr>
-          <td class="sts-label">Creatinine (mg/dL):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('creatinine')}" value="${getValue('creatinine')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Hematocrit (%):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('hematocrit')}" value="${getValue('hematocrit')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">WBC Count (10³/μL):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('wbc')}" value="${getValue('wbc')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Platelet Count (cells/μL):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('platelets')}" value="${getValue('platelets')}" disabled />
-          </td>
-        </tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">PREOPERATIVE MEDICATIONS</td></tr>
-        
-        <tr>
-          <td colspan="2">
-            <label style="font-size: 9px;"><input type="checkbox" ${getChecked('medACEInhibitors')} disabled /> ACE Inhibitors/ARBs ≤ 48 hrs</label>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <label style="font-size: 9px;"><input type="checkbox" ${getChecked('medGPInhibitor')} disabled /> GP IIb/IIIa Inhibitor ≤ 24 hrs</label>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <label style="font-size: 9px;"><input type="checkbox" ${getChecked('medInotropes')} disabled /> Inotropes ≤ 48 hrs</label>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <label style="font-size: 9px;"><input type="checkbox" ${getChecked('medSteroids')} disabled /> Steroids ≤ 24 hrs</label>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <label style="font-size: 9px;"><input type="checkbox" ${getChecked('medADPInhibitors')} disabled /> ADP Inhibitors ≤ 5 days</label>
-          </td>
-        </tr>
-        
-      </table>
-      
-    </td><td style="margin: 0; padding: 0 8px; vertical-align: top; width: 33.33%;"><table class="sts-table" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;"><tr style="margin: 0; padding: 0;"><td colspan="2" class="sts-section" style="margin: 0; padding: 5px;">RISK FACTORS / COMORBIDITIES</td></tr>
-        
-        <tr>
-          <td class="sts-label">Diabetes:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('diabetes')}" disabled>
-              <option ${getSelected('diabetes', null)}>Select</option>
-              <option ${getSelected('diabetes', 'No')}>No</option>
-              <option ${getSelected('diabetes', 'Yes, Diet Only')}>Yes, Diet Only</option>
-              <option ${getSelected('diabetes', 'Yes, Oral')}>Yes, Oral</option>
-              <option ${getSelected('diabetes', 'Yes, Insulin')}>Yes, Insulin</option>
-              <option ${getSelected('diabetes', 'Yes, Other SubQ')}>Yes, Other SubQ</option>
-              <option ${getSelected('diabetes', 'Yes, Other Control')}>Yes, Other Control</option>
-              <option ${getSelected('diabetes', 'Yes, Unknown Control')}>Yes, Unknown Control</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('familyHxCAD')} disabled /> Family Hx of CAD</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('hypertension')} disabled /> Hypertension</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('liverDisease')} disabled /> Liver Disease</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('mediastinalRadiation')} disabled /> Mediastinal Radiation</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('unresponsiveState')} disabled /> Unresponsive State</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('dialysis')} disabled /> Dialysis</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('cancer')} disabled /> Cancer ≤ 5 yrs</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('syncope')} disabled /> Syncope</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('immunocompromised')} disabled /> Immunocompromised</label></td></tr>
-        
-        <tr>
-          <td class="sts-label">Endocarditis:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('endocarditis')}" disabled>
-              <option ${getSelected('endocarditis', null)}>Select</option>
-              <option ${getSelected('endocarditis', 'No')}>No</option>
-              <option ${getSelected('endocarditis', 'Yes, treated')}>Yes, treated</option>
-              <option ${getSelected('endocarditis', 'Yes, active')}>Yes, active</option>
-              <option ${getSelected('endocarditis', 'Yes, unknown')}>Yes, unknown</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Illicit Drug Use:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('illicitDrugUse')}" disabled>
-              <option ${getSelected('illicitDrugUse', null)}>Select</option>
-              <option ${getSelected('illicitDrugUse', 'No')}>No</option>
-              <option ${getSelected('illicitDrugUse', 'Yes')}>Yes</option>
-              <option ${getSelected('illicitDrugUse', 'Unknown')}>Unknown</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Alcohol Use:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('alcoholUse')}" disabled>
-              <option ${getSelected('alcoholUse', null)}>Select</option>
-              <option ${getSelected('alcoholUse', 'None')}>None</option>
-              <option ${getSelected('alcoholUse', '≤ 1 drink/week')}>≤ 1 drink/week</option>
-              <option ${getSelected('alcoholUse', '2-7 drinks/week')}>2-7 drinks/week</option>
-              <option ${getSelected('alcoholUse', '≥ 8 drinks/week')}>≥ 8 drinks/week</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Tobacco Use:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('tobaccoUse')}" disabled>
-              <option ${getSelected('tobaccoUse', null)}>Select</option>
-              <option ${getSelected('tobaccoUse', 'Never smoker')}>Never smoker</option>
-              <option ${getSelected('tobaccoUse', 'Current smoker')}>Current smoker</option>
-              <option ${getSelected('tobaccoUse', 'Former smoker')}>Former smoker</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">PULMONARY</td></tr>
-        
-        <tr>
-          <td class="sts-label">Chronic Lung Disease:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('chronicLungDisease')}" disabled>
-              <option ${getSelected('chronicLungDisease', null)}>Select</option>
-              <option ${getSelected('chronicLungDisease', 'No')}>No</option>
-              <option ${getSelected('chronicLungDisease', 'Mild')}>Mild</option>
-              <option ${getSelected('chronicLungDisease', 'Moderate')}>Moderate</option>
-              <option ${getSelected('chronicLungDisease', 'Severe')}>Severe</option>
-              <option ${getSelected('chronicLungDisease', 'Severity Unknown')}>Severity Unknown</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('recentPneumonia')} disabled /> Recent Pneumonia</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('sleepApnea')} disabled /> Sleep Apnea</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('homeOxygen')} disabled /> Home O₂</label></td></tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">VASCULAR</td></tr>
-        
-        <tr>
-          <td class="sts-label">Cerebrovascular Disease:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('cerebrovascularDisease')}" disabled>
-              <option ${getSelected('cerebrovascularDisease', null)}>Select</option>
-              <option ${getSelected('cerebrovascularDisease', 'No')}>No</option>
-              <option ${getSelected('cerebrovascularDisease', 'CVA ≤ 30 days')}>CVA ≤ 30 days</option>
-              <option ${getSelected('cerebrovascularDisease', 'CVA > 30 days')}>CVA > 30 days</option>
-              <option ${getSelected('cerebrovascularDisease', 'TIA')}>TIA</option>
-              <option ${getSelected('cerebrovascularDisease', 'Other CVD')}>Other CVD</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('pvd')} disabled /> Peripheral Artery Disease</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('priorCarotidSurgery')} disabled /> Prior Carotid Surgery</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('rightCarotidStenosis')} disabled /> Right Carotid Sten. ≥ 80%</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('leftCarotidStenosis')} disabled /> Left Carotid Sten. ≥ 80%</label></td></tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">CARDIAC STATUS</td></tr>
-        
-        <tr>
-          <td class="sts-label">Heart Failure:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('heartFailure')}" disabled>
-              <option ${getSelected('heartFailure', null)}>Select</option>
-              <option ${getSelected('heartFailure', 'None')}>None</option>
-              <option ${getSelected('heartFailure', 'Yes - Acute')}>Yes - Acute</option>
-              <option ${getSelected('heartFailure', 'Yes - Chronic')}>Yes - Chronic</option>
-              <option ${getSelected('heartFailure', 'Yes - Both')}>Yes - Both</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">NYHA Classification:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('nyhaClass')}" disabled>
-              <option ${getSelected('nyhaClass', null)}>Select</option>
-              <option ${getSelected('nyhaClass', 'Class I')}>Class I</option>
-              <option ${getSelected('nyhaClass', 'Class II')}>Class II</option>
-              <option ${getSelected('nyhaClass', 'Class III')}>Class III</option>
-              <option ${getSelected('nyhaClass', 'Class IV')}>Class IV</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">PreOp Mech Circ Support:</td>
-          <td class="sts-value">
-            <input type="text" class="sts-input" style="${highlight('mechanicalSupport')}" value="${getValue('mechanicalSupport')}" disabled />
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Ejection Fraction (%):</td>
-          <td class="sts-value">
-            <input type="number" class="sts-input" style="${highlight('ejectionFraction')}" value="${getValue('ejectionFraction')}" disabled />
-          </td>
-        </tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('cardiogenicShock')} disabled /> Cardiogenic Shock</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('resuscitation')} disabled /> Resuscitation ≤ 1hr</label></td></tr>
-        
-      </table>
-    </td><td style="margin: 0; padding: 0 8px; vertical-align: top; width: 33.33%;"><table class="sts-table" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;"><tr style="margin: 0; padding: 0;"><td colspan="2" class="sts-section" style="margin: 0; padding: 5px;">CORONARY ARTERY DISEASE</td></tr>
-        
-        <tr>
-          <td class="sts-label">Primary Coronary Symptom:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('primaryCoronarySymptom')}" disabled>
-              <option ${getSelected('primaryCoronarySymptom', null)}>Select</option>
-              <option ${getSelected('primaryCoronarySymptom', 'No coronary symptoms')}>No coronary symptoms</option>
-              <option ${getSelected('primaryCoronarySymptom', 'Stable Angina')}>Stable Angina</option>
-              <option ${getSelected('primaryCoronarySymptom', 'Unstable Angina')}>Unstable Angina</option>
-              <option ${getSelected('primaryCoronarySymptom', 'Non-ST Elevation MI')}>Non-ST Elevation MI</option>
-              <option ${getSelected('primaryCoronarySymptom', 'STEMI')}>STEMI</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Myocardial Infarction - When:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('miTiming')}" disabled>
-              <option ${getSelected('miTiming', null)}>Select</option>
-              <option ${getSelected('miTiming', 'No MI')}>No MI</option>
-              <option ${getSelected('miTiming', '≤ 6 Hrs')}>≤ 6 Hrs</option>
-              <option ${getSelected('miTiming', '>6 Hrs but <24 Hrs')}>>6 Hrs but <24 Hrs</option>
-              <option ${getSelected('miTiming', '1 to 7 Days')}>1 to 7 Days</option>
-              <option ${getSelected('miTiming', '8 to 21 Days')}>8 to 21 Days</option>
-              <option ${getSelected('miTiming', '> 21 Days')}>> 21 Days</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">No. of Diseased Vessels:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('numberOfDiseasedVessels')}" disabled>
-              <option ${getSelected('numberOfDiseasedVessels', null)}>Select</option>
-              <option ${getSelected('numberOfDiseasedVessels', 'None')}>None</option>
-              <option ${getSelected('numberOfDiseasedVessels', 'One')}>One</option>
-              <option ${getSelected('numberOfDiseasedVessels', 'Two')}>Two</option>
-              <option ${getSelected('numberOfDiseasedVessels', 'Three')}>Three</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('leftMainStenosis')} disabled /> Left Main Sten. ≥ 50%</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('proximalLADStenosis')} disabled /> Proximal LAD Sten. ≥ 70%</label></td></tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">VALVE DISEASE</td></tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('aorticStenosis')} disabled /> Aortic Stenosis</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('mitralStenosis')} disabled /> Mitral Stenosis</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('aorticRootAbscess')} disabled /> Aortic Root Abscess</label></td></tr>
-        
-        <tr>
-          <td class="sts-label">Aortic Regurgitation:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('aorticRegurgitation')}" disabled>
-              <option ${getSelected('aorticRegurgitation', null)}>Select</option>
-              <option ${getSelected('aorticRegurgitation', 'None')}>None</option>
-              <option ${getSelected('aorticRegurgitation', 'Trivial/Trace')}>Trivial/Trace</option>
-              <option ${getSelected('aorticRegurgitation', 'Mild')}>Mild</option>
-              <option ${getSelected('aorticRegurgitation', 'Moderate')}>Moderate</option>
-              <option ${getSelected('aorticRegurgitation', 'Severe')}>Severe</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Mitral Regurgitation:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('mitralRegurgitation')}" disabled>
-              <option ${getSelected('mitralRegurgitation', null)}>Select</option>
-              <option ${getSelected('mitralRegurgitation', 'None')}>None</option>
-              <option ${getSelected('mitralRegurgitation', 'Trivial/Trace')}>Trivial/Trace</option>
-              <option ${getSelected('mitralRegurgitation', 'Mild')}>Mild</option>
-              <option ${getSelected('mitralRegurgitation', 'Moderate')}>Moderate</option>
-              <option ${getSelected('mitralRegurgitation', 'Severe')}>Severe</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Tricuspid Regurgitation:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('tricuspidRegurgitation')}" disabled>
-              <option ${getSelected('tricuspidRegurgitation', null)}>Select</option>
-              <option ${getSelected('tricuspidRegurgitation', 'None')}>None</option>
-              <option ${getSelected('tricuspidRegurgitation', 'Trivial/Trace')}>Trivial/Trace</option>
-              <option ${getSelected('tricuspidRegurgitation', 'Mild')}>Mild</option>
-              <option ${getSelected('tricuspidRegurgitation', 'Moderate')}>Moderate</option>
-              <option ${getSelected('tricuspidRegurgitation', 'Severe')}>Severe</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">ARRHYTHMIA</td></tr>
-        
-        <tr>
-          <td class="sts-label">Atrial Fibrillation:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('atrialFibrillation')}" disabled>
-              <option ${getSelected('atrialFibrillation', null)}>Select</option>
-              <option ${getSelected('atrialFibrillation', 'None')}>None</option>
-              <option ${getSelected('atrialFibrillation', 'Remote')}>Remote</option>
-              <option ${getSelected('atrialFibrillation', 'Recent')}>Recent</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">Atrial Flutter:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('atrialFlutter')}" disabled>
-              <option ${getSelected('atrialFlutter', null)}>Select</option>
-              <option ${getSelected('atrialFlutter', 'None')}>None</option>
-              <option ${getSelected('atrialFlutter', 'Remote')}>Remote</option>
-              <option ${getSelected('atrialFlutter', 'Recent')}>Recent</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr>
-          <td class="sts-label">V. Tach / V. Fib:</td>
-          <td class="sts-value">
-            <select class="sts-select" style="${highlight('ventricularArrhythmia')}" disabled>
-              <option ${getSelected('ventricularArrhythmia', null)}>Select</option>
-              <option ${getSelected('ventricularArrhythmia', 'None')}>None</option>
-              <option ${getSelected('ventricularArrhythmia', 'Remote')}>Remote</option>
-              <option ${getSelected('ventricularArrhythmia', 'Recent')}>Recent</option>
-            </select>
-          </td>
-        </tr>
-        
-        <tr><td colspan="2" class="sts-section" style="margin-top: 8px;">PREVIOUS CARDIAC INTERVENTIONS</td></tr>
-        
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('previousCABG')} disabled /> Previous CABG</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('previousValve')} disabled /> Previous Valve Surgery</label></td></tr>
-        <tr><td colspan="2"><label style="font-size: 9px;"><input type="checkbox" ${getChecked('previousPCI')} disabled /> Previous PCI</label></td></tr>
-        
-      </table>
-    </td></tr></table>
-  
-  <div style="margin-top: 15px; padding: 8px; background: #e6f2ff; border-left: 4px solid #003366; font-size: 9px;">
-    <strong>📊 Data Extraction Summary:</strong> ${Object.values(data).filter(v => v !== null && v !== undefined && v !== '').length} fields extracted. Yellow highlights = extracted values.
-  </div>
-  
+<div class="sts-wrapper">
+<table class="sts-main-table"><tr>
+<td><table class="sts-col-table">
+${sectionHeader('PLANNED SURGERY')}
+${row('Procedure Type:', select('procedureType', ['Isolated CABG', 'Isolated AVR', 'Isolated MVR', 'AVR + CABG', 'MVR + CABG', 'MV Repair', 'MV Repair for Primary MR', 'MV Repair + CABG']))}
+${row('Surgery Incidence:', select('surgeryIncidence', ['First CV surgery', 'ReOp#1', 'ReOp#2', 'ReOp#3', 'ReOp≥4']))}
+${row('Surgical Priority:', select('priority', ['Elective', 'Urgent', 'Emergent', 'Emergent Salvage']))}
+${sectionHeader('DEMOGRAPHICS')}
+${row('Sex:', select('gender', ['Male', 'Female']))}
+${row('Age (years):', inputField('age', 'number'))}
+${row('Height (cm):', inputField('height', 'number'))}
+${row('Weight (kg):', inputField('weight', 'number'))}
+${row('BMI (kg/m²):', inputField('bmi', 'number'))}
+${row('Race:', inputField('race'))}
+${row('Payor / Insurance:', inputField('payor'))}
+${sectionHeader('LABORATORY VALUES')}
+${row('Creatinine (mg/dL):', inputField('creatinine', 'number'))}
+${row('Hematocrit (%):', inputField('hematocrit', 'number'))}
+${row('WBC Count (10³/μL):', inputField('wbc', 'number'))}
+${row('Platelet Count (cells/μL):', inputField('platelets', 'number'))}
+${sectionHeader('PREOPERATIVE MEDICATIONS')}
+${checkboxField('medACEInhibitors', 'ACE Inhibitors/ARBs ≤ 48 hrs')}
+${checkboxField('medGPInhibitor', 'GP IIb/IIIa Inhibitor ≤ 24 hrs')}
+${checkboxField('medInotropes', 'Inotropes ≤ 48 hrs')}
+${checkboxField('medSteroids', 'Steroids ≤ 24 hrs')}
+${checkboxField('medADPInhibitors', 'ADP Inhibitors ≤ 5 days')}
+</table></td>
+<td><table class="sts-col-table">
+${sectionHeader('RISK FACTORS / COMORBIDITIES')}
+${row('Diabetes:', select('diabetes', ['No', 'Yes, Diet Only', 'Yes, Oral', 'Yes, Insulin', 'Yes, Other SubQ', 'Yes, Other Control', 'Yes, Unknown Control']))}
+${checkboxField('familyHxCAD', 'Family Hx of CAD')}
+${checkboxField('hypertension', 'Hypertension')}
+${checkboxField('liverDisease', 'Liver Disease')}
+${checkboxField('mediastinalRadiation', 'Mediastinal Radiation')}
+${checkboxField('unresponsiveState', 'Unresponsive State')}
+${checkboxField('dialysis', 'Dialysis')}
+${checkboxField('cancer', 'Cancer ≤ 5 yrs')}
+${checkboxField('syncope', 'Syncope')}
+${checkboxField('immunocompromised', 'Immunocompromised')}
+${row('Endocarditis:', select('endocarditis', ['No', 'Yes, treated', 'Yes, active', 'Yes, unknown']))}
+${row('Illicit Drug Use:', select('illicitDrugUse', ['No', 'Yes', 'Unknown']))}
+${row('Alcohol Use:', select('alcoholUse', ['None', '≤ 1 drink/week', '2-7 drinks/week', '≥ 8 drinks/week']))}
+${row('Tobacco Use:', select('tobaccoUse', ['Never smoker', 'Current smoker', 'Former smoker']))}
+${sectionHeader('PULMONARY')}
+${row('Chronic Lung Disease:', select('chronicLungDisease', ['No', 'Mild', 'Moderate', 'Severe', 'Severity Unknown']))}
+${checkboxField('recentPneumonia', 'Recent Pneumonia')}
+${checkboxField('sleepApnea', 'Sleep Apnea')}
+${checkboxField('homeOxygen', 'Home O₂')}
+${sectionHeader('VASCULAR')}
+${row('Cerebrovascular Disease:', select('cerebrovascularDisease', ['No', 'CVA ≤ 30 days', 'CVA > 30 days', 'TIA', 'Other CVD']))}
+${checkboxField('pvd', 'Peripheral Artery Disease')}
+${checkboxField('priorCarotidSurgery', 'Prior Carotid Surgery')}
+${checkboxField('rightCarotidStenosis', 'Right Carotid Sten. ≥ 80%')}
+${checkboxField('leftCarotidStenosis', 'Left Carotid Sten. ≥ 80%')}
+${sectionHeader('CARDIAC STATUS')}
+${row('Heart Failure:', select('heartFailure', ['None', 'Yes - Acute', 'Yes - Chronic', 'Yes - Both']))}
+${row('NYHA Classification:', select('nyhaClass', ['Class I', 'Class II', 'Class III', 'Class IV']))}
+${row('PreOp Mech Circ Support:', inputField('mechanicalSupport'))}
+${row('Ejection Fraction (%):', inputField('ejectionFraction', 'number'))}
+${checkboxField('cardiogenicShock', 'Cardiogenic Shock')}
+${checkboxField('resuscitation', 'Resuscitation ≤ 1hr')}
+</table></td>
+<td><table class="sts-col-table">
+${sectionHeader('CORONARY ARTERY DISEASE')}
+${row('Primary Coronary Symptom:', select('primaryCoronarySymptom', ['No coronary symptoms', 'Stable Angina', 'Unstable Angina', 'Non-ST Elevation MI', 'STEMI']))}
+${row('Myocardial Infarction - When:', select('miTiming', ['No MI', '≤ 6 Hrs', '>6 Hrs but <24 Hrs', '1 to 7 Days', '8 to 21 Days', '> 21 Days']))}
+${row('No. of Diseased Vessels:', select('numberOfDiseasedVessels', ['None', 'One', 'Two', 'Three']))}
+${checkboxField('leftMainStenosis', 'Left Main Sten. ≥ 50%')}
+${checkboxField('proximalLADStenosis', 'Proximal LAD Sten. ≥ 70%')}
+${sectionHeader('VALVE DISEASE')}
+${checkboxField('aorticStenosis', 'Aortic Stenosis')}
+${checkboxField('mitralStenosis', 'Mitral Stenosis')}
+${checkboxField('aorticRootAbscess', 'Aortic Root Abscess')}
+${row('Aortic Regurgitation:', select('aorticRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe']))}
+${row('Mitral Regurgitation:', select('mitralRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe']))}
+${row('Tricuspid Regurgitation:', select('tricuspidRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe']))}
+${sectionHeader('ARRHYTHMIA')}
+${row('Atrial Fibrillation:', select('atrialFibrillation', ['None', 'Remote', 'Recent']))}
+${row('Atrial Flutter:', select('atrialFlutter', ['None', 'Remote', 'Recent']))}
+${row('V. Tach / V. Fib:', select('ventricularArrhythmia', ['None', 'Remote', 'Recent']))}
+${sectionHeader('PREVIOUS CARDIAC INTERVENTIONS')}
+${checkboxField('previousCABG', 'Previous CABG')}
+${checkboxField('previousValve', 'Previous Valve Surgery')}
+${checkboxField('previousPCI', 'Previous PCI')}
+</table></td>
+</tr></table>
+
+<div style="margin-top: 10px; padding: 6px; background: #e6f2ff; border-left: 3px solid #003366; font-size: 9px;">
+<strong>📊 Data Extraction Summary:</strong> ${Object.values(data).filter(v => v !== null && v !== undefined && v !== '').length} fields extracted. Yellow highlights = extracted values.
 </div>
 
-</div>
-  `;
+</div>`;
 }
 
 router.post('/', async (req, res) => {
   const { mode, data } = req.body;
 
-  if (!mode || !data) {
+  if (!mode | !data) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
@@ -520,7 +161,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Invalid mode' });
   }
 
-  const patientNotes = data.patientNotes || data.history || '';
+  const patientNotes = data.patientNotes | data.history | '';
   
   if (!patientNotes) {
     return res.status(400).json({ error: 'Patient notes required' });
@@ -640,69 +281,89 @@ Return ONLY the JSON object. Extract everything possible, use null for missing d
         .replace(/```json\n?/g, '').replace(/```\n?/g, '')
     );
 
-    console.log('🤖 Stage 2A: AI risk estimation...');
-    
-    const aiPrompt = `You are a cardiac surgery risk assessment specialist. Based on this comprehensive STS data, provide detailed risk analysis:
-
-${JSON.stringify(structuredData, null, 2)}
-
-Provide:
-1. **PATIENT SUMMARY**: Brief clinical overview
-2. **ESTIMATED RISK SCORES**: 
-   - Mortality Risk (PROM): X%
-   - Morbidity Risk (PROMM): X%
-   - Risk Category: Low/Moderate/High
-3. **KEY RISK FACTORS**: List major contributors
-4. **CLINICAL RECOMMENDATIONS**: Perioperative considerations
-
-Be specific with percentages based on STS guidelines.`;
-
-    const aiEst = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: aiPrompt }],
-      temperature: 0.3
-    });
-
-    const aiText = aiEst.choices[0].message.content;
-
-    console.log('🔢 Stage 2B: Mathematical calculation...');
+    console.log('🔢 Stage 2B: Mathematical calculation (performed FIRST)...');
     
     const mathResult = calculateSTSRisk(structuredData);
 
-    let mathTable = '';
+    // Format results as clean table similar to official STS calculator
+    let mathTable = `
+### 🔬 CALCULATED PERIOPERATIVE RISK ESTIMATES
+
+**Model Type:** ${structuredData.procedureType || 'STS CABG'} Risk Model  
+**Method:** Published STS Logistic Regression Coefficients (2018)  
+
+| PERIOPERATIVE OUTCOME | ESTIMATE % |
+|---|---|
+| **Operative Mortality** | **${mathResult.mortality}%** |
+| **Morbidity & Mortality** | **${mathResult.morbidity || 'Not calculated'}%** |`;
+
+    // Add additional outcomes if available (CABG only)
+    if (mathResult.stroke) {
+      mathTable += `
+| **Stroke** | **${mathResult.stroke}%** |`;
+    }
+    
+    if (mathResult.renalFailure) {
+      mathTable += `
+| **Renal Failure** | **${mathResult.renalFailure}** |`;
+    }
+    
+    if (mathResult.reoperation) {
+      mathTable += `
+| **Reoperation** | **${mathResult.reoperation}%** |`;
+    }
+    
+    if (mathResult.prolongedVentilation) {
+      mathTable += `
+| **Prolonged Ventilation** | **${mathResult.prolongedVentilation}%** |`;
+    }
+    
+    if (mathResult.deepSternalWoundInfection) {
+      mathTable += `
+| **Deep Sternal Wound Infection** | **${mathResult.deepSternalWoundInfection}%** |`;
+    }
+    
+    if (mathResult.longHospitalStay) {
+      mathTable += `
+| **Long Hospital Stay (> 14 days)** | **${mathResult.longHospitalStay}%** |`;
+    }
+    
+    if (mathResult.shortHospitalStay) {
+      mathTable += `
+| **Short Hospital Stay (<6 days)*** | **${mathResult.shortHospitalStay}%** |`;
+    }
+    
+    mathTable += `\n\n**Risk Category:** ${mathResult.riskCategory}  \n**Calculation Confidence:** ${mathResult.confidence}\n\n`;
+    
+    // Add detailed step-by-step calculation AFTER the summary table
     let logitSum = 0;
     let finalProbability = null;
     
     if (mathResult.detailedSteps && mathResult.detailedSteps.length > 0) {
-      // Build calculation summary
-      let calculationSteps = '';
-      let stepNum = 1;
-      
-      mathTable = `### Step-by-Step Logistic Regression Calculation\n\n`;
-      mathTable += `This calculation uses the published STS logistic regression model:\n`;
-      mathTable += `**P(mortality) = 1 / (1 + e^(-logit))**\n\n`;
-      mathTable += `Where **logit = intercept + Σ(coefficient × risk_factor)**\n\n`;
+      mathTable += `---\n\n### 📊 DETAILED CALCULATION BREAKDOWN (MORTALITY MODEL)\n\n`;
+      mathTable += `This section shows the step-by-step mathematical calculation for **Operative Mortality** using logistic regression.\n\n`;
+      mathTable += `**Formula:** P(mortality) = 1 / (1 + e^(-logit))  \n**Where:** logit = intercept + Σ(coefficient × risk_factor)\n\n`;
       mathTable += `---\n\n`;
-      mathTable += `#### Step 1: Building the Logit Sum\n\n`;
-      mathTable += `| Step | Risk Factor | Patient Value | Coefficient | Mathematical Calculation | Logit Contribution |\n|---|---|---|---|---|---|\n`;
+      mathTable += `#### Step 1: Risk Factor Contributions to Logit\n\n`;
+      mathTable += `| Step | Risk Factor | Patient Value | Coefficient | Calculation | Logit Contribution |\n|---|---|---|---|---|---|\n`;
       
+      let stepNum = 1;
       mathResult.detailedSteps.forEach(s => {
-        // Skip the final transformation steps for now, we'll add them separately
+        // Skip the final transformation steps for now
         if (s.variable.includes('TOTAL LOGIT')) {
           logitSum = parseFloat(s.contribution);
           return;
         }
-        if (s.variable.includes('LOGISTIC TRANSFORMATION') || s.variable.includes('FINAL MORTALITY')) {
+        if (s.variable.includes('LOGISTIC TRANSFORMATION') | s.variable.includes('FINAL MORTALITY')) {
           if (s.variable.includes('LOGISTIC TRANSFORMATION')) {
             finalProbability = parseFloat(s.contribution);
           }
           return;
         }
         
-        // Format calculation field more explicitly
-        let calcDisplay = s.calculation || '-';
+        // Format calculation field
+        let calcDisplay = s.calculation | '-';
         if (!s.calculation && s.coefficient !== '-' && s.variable !== 'Baseline Intercept') {
-          // For binary risk factors, show coefficient × 1
           calcDisplay = `${s.coefficient} × 1 = ${s.contribution}`;
         } else if (s.variable === 'Baseline Intercept') {
           calcDisplay = `Intercept = ${s.contribution}`;
@@ -712,55 +373,97 @@ Be specific with percentages based on STS guidelines.`;
         stepNum++;
       });
       
-      // Add the logit sum step
+      // Add remaining steps
       const totalLogitStep = mathResult.detailedSteps.find(s => s.variable.includes('TOTAL LOGIT'));
       if (totalLogitStep) {
-        mathTable += `\n#### Step 2: Calculate Total Logit (Summation)\n\n`;
-        mathTable += `Add all logit contributions together:\n\n`;
-        
-        // Build the addition string
-        let additionParts = [];
-        let isFirst = true;
-        mathResult.detailedSteps.forEach(s => {
-          if (!s.variable.includes('TOTAL LOGIT') && 
-              !s.variable.includes('LOGISTIC TRANSFORMATION') && 
-              !s.variable.includes('FINAL MORTALITY')) {
-            const contrib = parseFloat(s.contribution);
-            if (Math.abs(contrib) > 0.001) { // Ignore essentially zero values
-              if (isFirst) {
-                additionParts.push(contrib.toFixed(3));
-                isFirst = false;
-              } else {
-                additionParts.push(contrib >= 0 ? `+ ${contrib.toFixed(3)}` : `${contrib.toFixed(3)}`);
-              }
-            }
-          }
-        });
-        
-        mathTable += `**Total Logit = ${additionParts.join(' ')} = ${totalLogitStep.contribution}**\n\n`;
-        mathTable += `This is the sum of the baseline intercept plus all risk factor contributions shown in Step 1.\n\n`;
+        mathTable += `\n#### Step 2: Calculate Total Logit (Sum)\n\n`;
+        mathTable += `**Total Logit = ${totalLogitStep.contribution}**\n\n`;
       }
       
-      // Add the logistic transformation step
       const logisticStep = mathResult.detailedSteps.find(s => s.variable.includes('LOGISTIC TRANSFORMATION'));
       if (logisticStep) {
-        mathTable += `#### Step 3: Logistic Transformation (Logit → Probability)\n\n`;
-        mathTable += `Using the logistic function: **P = 1 / (1 + e^(-logit))**\n\n`;
-        mathTable += `- **Logit value:** ${logitSum.toFixed(3)}\n`;
-        mathTable += `- **Calculation:** ${logisticStep.calculation || logisticStep.value}\n`;
-        mathTable += `- **Result:** P = ${finalProbability ? finalProbability.toFixed(6) : logisticStep.contribution}\n\n`;
+        mathTable += `#### Step 3: Logistic Transformation\n\n`;
+        mathTable += `**P = 1 / (1 + e^(-${logitSum.toFixed(3)})) = ${finalProbability ? finalProbability.toFixed(6) : logisticStep.contribution}**\n\n`;
       }
       
-      // Add the final mortality step
       const finalStep = mathResult.detailedSteps.find(s => s.variable.includes('FINAL MORTALITY'));
       if (finalStep) {
         mathTable += `#### Step 4: Convert to Percentage\n\n`;
-        mathTable += `**Mortality Risk = ${finalStep.contribution}**\n\n`;
-        mathTable += `This is the final predicted risk of operative mortality (PROM) calculated from the mathematical model.\n\n`;
+        mathTable += `**Operative Mortality Risk = ${finalStep.contribution}**\n\n`;
       }
     }
     
     const stsForm = generateSTSFormHTML(structuredData);
+    
+    // Prepare manual calculation summary for AI
+    const manualCalculationSummary = `
+**Manual Mathematical Model Results (ALL STS OUTCOMES):**
+
+| Outcome | Calculated Risk |
+|---|---|
+| Operative Mortality (PROM) | ${mathResult.mortality}% |
+| Morbidity & Mortality (PROMM) | ${mathResult.morbidity}% |
+${mathResult.stroke ? `| Stroke | ${mathResult.stroke}% |` : ''}
+${mathResult.renalFailure ? `| Renal Failure | ${mathResult.renalFailure} |` : ''}
+${mathResult.reoperation ? `| Reoperation | ${mathResult.reoperation}% |` : ''}
+${mathResult.prolongedVentilation ? `| Prolonged Ventilation | ${mathResult.prolongedVentilation}% |` : ''}
+${mathResult.deepSternalWoundInfection ? `| Deep Sternal Wound Infection | ${mathResult.deepSternalWoundInfection}% |` : ''}
+${mathResult.longHospitalStay ? `| Long Hospital Stay (>14d) | ${mathResult.longHospitalStay}% |` : ''}
+${mathResult.shortHospitalStay ? `| Short Hospital Stay (<6d) | ${mathResult.shortHospitalStay}% |` : ''}
+
+**Risk Category:** ${mathResult.riskCategory}
+**Model Type:** ${structuredData.procedureType || 'STS CABG'} Risk Model
+
+**Key Risk Factors:**
+${mathResult.detailedSteps ? mathResult.detailedSteps.slice(1, 8).map(s => `- ${s.variable}: ${s.contribution}`).join('\n') : 'Detailed steps available'}
+`;
+
+    console.log('🤖 Stage 2A: AI risk estimation with manual calculation comparison...');
+    
+    const aiPrompt = `You are a cardiac surgery risk assessment specialist. You have been provided with both patient data and the manual mathematical calculation results from the official STS risk model.
+
+**Patient Data (Structured):**
+${JSON.stringify(structuredData, null, 2)}
+
+${manualCalculationSummary}
+
+Your task is to:
+1. **ANALYZE THE MANUAL CALCULATIONS**: Review the mathematically calculated risks
+2. **COMPARE WITH YOUR ASSESSMENT**: Provide your own clinical risk assessment
+3. **IDENTIFY DISCREPANCIES**: If your assessment differs from the manual calculation, explain why
+4. **VALIDATE OR QUESTION**: Do the manual calculations align with the patient's clinical picture?
+
+Provide your analysis in this format:
+
+### MANUAL CALCULATION REVIEW
+- Briefly summarize what the mathematical model calculated
+- State whether these numbers seem reasonable for this patient
+
+### YOUR INDEPENDENT ASSESSMENT
+- **Estimated Mortality Risk (PROM)**: X%
+- **Estimated Morbidity Risk (PROMM)**: X%
+- **Risk Category**: Low/Moderate/High
+- Brief clinical reasoning
+
+### COMPARISON & DISCREPANCY ANALYSIS
+- Compare your assessment with the manual calculation
+- If they differ significantly (>1%), explain the clinical reasons
+- Highlight any risk factors the mathematical model might have weighted differently
+
+### KEY RISK FACTORS & RECOMMENDATIONS
+- List major contributors to risk
+- Perioperative considerations
+- Clinical recommendations
+
+Be specific, analytical, and highlight any important differences between the mathematical model and clinical judgment.`;
+
+    const aiEst = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: aiPrompt }],
+      temperature: 0.3
+    });
+
+    const aiText = aiEst.choices[0].message.content;
     
     const report = `
 # STS RISK SCORE ANALYSIS
@@ -772,15 +475,9 @@ Be specific with percentages based on STS guidelines.`;
 
 ${stsForm}
 
----
+---SECTION---
 
-## 🤖 TAB 2: AI ANALYSIS RESULTS
-
-${aiText}
-
----
-
-## 🔢 TAB 3: MANUAL MATHEMATICAL CALCULATIONS
+## 🔢 TAB 2: MANUAL MATHEMATICAL CALCULATIONS
 
 **⚠️ NOTE:** This section uses **purely algorithmic calculations** based on published STS mathematical models. This is NOT AI-generated - it is deterministic mathematical computation using logistic regression coefficients.
 
@@ -788,27 +485,35 @@ ${aiText}
 **Method:** Deterministic Logistic Regression with Published STS Coefficients  
 **Calculation Type:** Algorithmic (non-AI)
 
----
-
 ${mathTable}
 
-### Final Results
+---SECTION---
 
-- **Mortality Risk (PROM):** ${mathResult.mortality}%
-- **Morbidity Risk (PROMM):** ${mathResult.morbidity}%
-- **Risk Category:** ${mathResult.riskCategory}
-- **Calculation Confidence:** ${mathResult.confidence}
+## 🤖 TAB 3: AI ANALYSIS WITH COMPARISON
+
+**⚠️ NOTE:** This section provides **AI-powered clinical analysis** that reviews and compares the mathematical calculations. The AI validates the numbers and provides clinical context.
+
+${aiText}
 
 ---
 
-## 📊 CLINICAL INTERPRETATION
+### Methodology Summary
 
-This analysis combines AI-based assessment with precise mathematical modeling to provide comprehensive risk stratification. Use alongside clinical judgment and patient preferences for shared decision-making.
+This analysis combines three approaches:
+1. **Patient Data Extraction** (AI + Human Review): Structured data from clinical notes
+2. **Manual Mathematical Calculation** (Algorithmic): Deterministic STS logistic regression models  
+3. **AI Clinical Analysis** (GPT-4o): Independent assessment and comparison with mathematical results
+
+This three-method approach ensures comprehensive risk stratification. Use alongside clinical judgment and patient preferences for shared decision-making.
 
 **Medical Disclaimer:** These estimates are computational tools for clinical decision support and do not replace physician judgment.
-`;
 
-    res.json({ response: report });
+---SECTION---`;
+
+    res.json({ 
+      response: report,
+      structuredData: structuredData // Include for standalone page
+    });
 
   } catch (err) {
     console.error('Error:', err);

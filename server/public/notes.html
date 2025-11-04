@@ -183,7 +183,7 @@
             </button>
             <div class="absolute left-0 top-full pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition ease-out duration-100">
               <div class="rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700">
-                <div class="py-1">
+              <div class="py-1">
                   <a href="#" id="nav-ecmo-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">ECMO Scorer</a>
                   <a href="#" id="nav-sts-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">STS Risk Calculator</a>
                 </div>
@@ -268,17 +268,13 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 inline-block"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
                 Patient Data
               </button>
-              <button class="tab-button tab-inactive flex-1 text-center" data-tab="patient-data-results">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 inline-block"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Patient Data
+              <button class="tab-button tab-inactive flex-1 text-center" data-tab="manual-calc">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 inline-block"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                Manual Calculations
               </button>
               <button class="tab-button tab-inactive flex-1 text-center" data-tab="ai-analysis">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 inline-block"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"/></svg>
                 AI Analysis
-              </button>
-              <button class="tab-button tab-inactive flex-1 text-center" data-tab="manual-calc">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4 inline-block"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
-                Manual Calculations
               </button>
             </div>
 
@@ -314,12 +310,27 @@
 
                 <!-- STS Form Fields -->
                 <div id="sts-form-fields" class="space-y-6 hidden">
-                  <div class="space-y-3">
+                  <!-- Patient Notes Input (shown initially) -->
+                  <div id="sts-notes-input" class="space-y-3">
                     <div class="flex items-center justify-between">
                       <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Patient Notes</label>
                       <span class="badge badge-outline">Required</span>
                     </div>
                     <textarea id="patient-notes" class="textarea min-h-[200px] resize-none" placeholder="Enter complete patient notes including history, physical examination, labs, imaging, and any other relevant clinical information..."></textarea>
+                  </div>
+                  
+                  <!-- Extracted Patient Data Form (shown after analysis) -->
+                  <div id="sts-extracted-form" class="hidden">
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">📋 Extracted Patient Data</h3>
+                      <button id="edit-sts-notes" class="btn btn-secondary btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        Edit Notes
+                      </button>
+                    </div>
+                    <div id="sts-form-display" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700" style="width: 100%; overflow-x: auto;">
+                      <div id="sts-form-content" style="max-width: none; width: 100%; display: block; padding: 20px;"></div>
+                    </div>
                   </div>
                 </div>
 
@@ -341,41 +352,6 @@
                 </div>
               </div>
 
-              <!-- Patient Data Results Tab -->
-              <div id="patient-data-results-tab" class="tab-content hidden animate-in">
-                <div id="patient-data-empty" class="text-center py-16">
-                  <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 dark:bg-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 dark:text-gray-400"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                  </div>
-                  <h3 class="text-lg font-medium text-gray-900 mb-2 dark:text-white">No Patient Data Yet</h3>
-                  <p class="text-gray-500 max-w-md mx-auto dark:text-gray-400">
-                    Submit patient notes to see extracted structured data.
-                  </p>
-                </div>
-                <div id="patient-data-content" class="bg-white rounded-lg border shadow-sm hidden dark:bg-gray-800 dark:border-gray-700" style="width: 100%; overflow-x: auto; min-width: 1200px; padding: 0; margin: 0; line-height: 0;">
-                  <div id="patient-data-text" style="max-width: none; width: 100%; margin: 0; padding: 0; line-height: 0; font-size: 0; display: block;"></div>
-                </div>
-              </div>
-
-              <!-- AI Analysis Tab -->
-              <div id="ai-analysis-tab" class="tab-content hidden animate-in">
-                <div id="ai-analysis-empty" class="text-center py-16">
-                  <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 dark:bg-gray-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 dark:text-gray-400"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"/></svg>
-                  </div>
-                  <h3 class="text-lg font-medium text-gray-900 mb-2 dark:text-white">No AI Analysis Yet</h3>
-                  <p class="text-gray-500 max-w-md mx-auto dark:text-gray-400">
-                    Submit patient data to receive AI-powered risk assessment.
-                  </p>
-                </div>
-                <div id="ai-analysis-content" class="bg-white rounded-lg border p-6 shadow-sm hidden dark:bg-gray-800 dark:border-gray-700">
-                  <div class="flex items-center gap-2 mb-4 text-primary-600 dark:text-primary-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    <h3 class="font-medium">AI Analysis Complete</h3>
-                  </div>
-                  <div id="ai-analysis-text" class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100"></div>
-                </div>
-              </div>
 
               <!-- Manual Calculations Tab -->
               <div id="manual-calc-tab" class="tab-content hidden animate-in">
@@ -394,6 +370,26 @@
                     <h3 class="font-medium">Calculations Complete</h3>
                   </div>
                   <div id="manual-calc-text" class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100"></div>
+                </div>
+              </div>
+
+              <!-- AI Analysis Tab -->
+              <div id="ai-analysis-tab" class="tab-content hidden animate-in">
+                <div id="ai-analysis-empty" class="text-center py-16">
+                  <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 dark:bg-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 dark:text-gray-400"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"/></svg>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2 dark:text-white">No AI Analysis Yet</h3>
+                  <p class="text-gray-500 max-w-md mx-auto dark:text-gray-400">
+                    Submit patient data to receive AI-powered risk assessment and comparison with manual calculations.
+                  </p>
+                </div>
+                <div id="ai-analysis-content" class="bg-white rounded-lg border p-6 shadow-sm hidden dark:bg-gray-800 dark:border-gray-700">
+                  <div class="flex items-center gap-2 mb-4 text-primary-600 dark:text-primary-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <h3 class="font-medium">AI Analysis Complete</h3>
+                  </div>
+                  <div id="ai-analysis-text" class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100"></div>
                 </div>
               </div>
 
@@ -626,6 +622,154 @@
       }
     };
 
+    // STS Form generation functions
+    function generateSTSFormInTab(data) {
+      if (!data) {
+        return '<p style="text-align: center; padding: 40px; color: #666;">No patient data available.</p>';
+      }
+      
+      const getSelected = (field, value) => data[field] === value ? 'selected' : '';
+      const getChecked = (field) => data[field] ? 'checked' : '';
+      const getValue = (field) => data[field] || '';
+      const highlight = (field) => data[field] && data[field] !== false && data[field] !== '' ? 'background-color: #fffacd;' : '';
+      
+      const row = (label, input) => `<tr><td class="sts-label">${label}</td><td class="sts-value">${input}</td></tr>`;
+      
+      const select = (field, options) => {
+        const opts = options.map(opt => {
+          const val = typeof opt === 'string' ? opt : opt.value;
+          const text = typeof opt === 'string' ? opt : opt.text;
+          return `<option value="${val}" ${getSelected(field, val)}>${text}</option>`;
+        }).join('');
+        return `<select class="sts-select" data-field="${field}" style="${highlight(field)}"><option value="">Select</option>${opts}</select>`;
+      };
+      
+      const inputField = (field, type = 'text') => {
+        return `<input type="${type}" class="sts-input" data-field="${field}" style="${highlight(field)}" value="${getValue(field)}" />`;
+      };
+      
+      const checkboxField = (field, label) => {
+        return `<tr><td colspan="2"><label class="sts-checkbox-label"><input type="checkbox" data-field="${field}" ${getChecked(field)} /> ${label}</label></td></tr>`;
+      };
+      
+      const sectionHeader = (title) => {
+        return `<tr><td colspan="2" class="sts-section">${title}</td></tr>`;
+      };
+      
+      return `
+<style>
+  .sts-form-wrapper { width: 100%; overflow-x: auto; margin-top: 10px; }
+  .sts-main-table { width: 100%; border-collapse: collapse; border-spacing: 0; table-layout: fixed; margin: 0; padding: 0; }
+  .sts-main-table tr { margin: 0; padding: 0; }
+  .sts-main-table td { margin: 0; padding: 0 10px; vertical-align: top; width: 33.33%; }
+  .sts-col-table { width: 100%; border-collapse: collapse; border-spacing: 0; margin: 0; padding: 0; }
+  .sts-col-table tr { margin: 0; padding: 0; }
+  .sts-col-table td { margin: 0; padding: 3px 5px; vertical-align: middle; }
+  .sts-label { font-weight: 500; font-size: 9px; width: 38%; padding-right: 6px; white-space: nowrap; }
+  .sts-value { width: 62%; }
+  .sts-section { background: #e0e0e0; padding: 6px 8px; font-weight: 600; font-size: 10px; border: 1px solid #999; margin: 0; }
+  .sts-input, .sts-select { padding: 3px 5px; border: 1px solid #666; border-radius: 2px; font-size: 9px; width: 100%; margin: 0; font-family: Arial, sans-serif; }
+  .sts-checkbox-label { font-size: 9px; margin: 0; padding: 0; display: block; }
+  .sts-checkbox-label input { margin-right: 5px; }
+  .sts-summary { margin-top: 20px; padding: 12px; background: #e6f2ff; border-left: 4px solid #003366; font-size: 11px; }
+</style>
+
+<div class="sts-form-wrapper">
+<table class="sts-main-table"><tr>
+<td><table class="sts-col-table">
+${sectionHeader('PLANNED SURGERY')}
+${row('Procedure Type:', select('procedureType', ['Isolated CABG', 'Isolated AVR', 'Isolated MVR', 'AVR + CABG', 'MVR + CABG', 'MV Repair - Any Etiology', 'MV Repair for Primary MR', 'MV Repair + CABG']))}
+${row('Surgery Incidence:', select('surgeryIncidence', ['First CV surgery', 'ReOp#1 CV surgery', 'ReOp#2 CV surgery', 'ReOp#3 CV surgery', 'ReOp≥4 CV surgery']))}
+${row('Surgical Priority:', select('priority', ['Elective', 'Urgent', 'Emergent', 'Emergent Salvage']))}
+${sectionHeader('DEMOGRAPHICS')}
+${row('Sex:', select('gender', ['Male', 'Female']))}
+${row('Age (years):', inputField('age', 'number'))}
+${row('Height (cm):', inputField('height', 'number'))}
+${row('Weight (kg):', inputField('weight', 'number'))}
+${row('BMI (kg/m²):', inputField('bmi', 'number'))}
+${row('Race:', inputField('race'))}
+${row('Payor / Insurance:', inputField('payor'))}
+${sectionHeader('LABORATORY VALUES')}
+${row('Creatinine (mg/dL):', inputField('creatinine', 'number'))}
+${row('Hematocrit (%):', inputField('hematocrit', 'number'))}
+${row('WBC Count (10³/μL):', inputField('wbc', 'number'))}
+${row('Platelet Count (cells/μL):', inputField('platelets', 'number'))}
+${sectionHeader('PREOPERATIVE MEDICATIONS')}
+${checkboxField('medACEInhibitors', 'ACE Inhibitors/ARBs ≤ 48 hrs')}
+${checkboxField('medGPInhibitor', 'GP IIb/IIIa Inhibitor ≤ 24 hrs')}
+${checkboxField('medInotropes', 'Inotropes ≤ 48 hrs')}
+${checkboxField('medSteroids', 'Steroids ≤ 24 hrs')}
+${checkboxField('medADPInhibitors', 'ADP Inhibitors ≤ 5 days')}
+</table></td>
+<td><table class="sts-col-table">
+${sectionHeader('RISK FACTORS / COMORBIDITIES')}
+${row('Diabetes:', select('diabetes', ['No', 'Yes, Diet Only', 'Yes, Oral', 'Yes, Insulin', 'Yes, Other SubQ', 'Yes, Other Control', 'Yes, No Control Method', 'Yes, Unknown Control', 'Unknown']))}
+${checkboxField('familyHxCAD', 'Family Hx of CAD')}
+${checkboxField('hypertension', 'Hypertension')}
+${checkboxField('liverDisease', 'Liver Disease')}
+${checkboxField('mediastinalRadiation', 'Mediastinal Radiation')}
+${checkboxField('unresponsiveState', 'Unresponsive State')}
+${checkboxField('dialysis', 'Dialysis')}
+${checkboxField('cancer', 'Cancer ≤ 5 yrs')}
+${checkboxField('syncope', 'Syncope')}
+${checkboxField('immunocompromised', 'Immunocompromised')}
+${row('Endocarditis:', select('endocarditis', ['No', 'Yes, treated', 'Yes, active', 'Yes, unknown']))}
+${row('Illicit Drug Use:', select('illicitDrugUse', ['No', 'Yes', 'Unknown']))}
+${row('Alcohol Use:', select('alcoholUse', ['None', '≤ 1 drink/week', '2-7 drinks/week', '≥ 8 drinks/week', 'Unknown']))}
+${row('Tobacco Use:', select('tobaccoUse', ['Never smoker', 'Current smoker', 'Former smoker', 'Smoking status unknown']))}
+${sectionHeader('PULMONARY')}
+${row('Chronic Lung Disease:', select('chronicLungDisease', ['No', 'Mild', 'Moderate', 'Severe', 'Severity Unknown', 'Unknown']))}
+${checkboxField('recentPneumonia', 'Recent Pneumonia')}
+${checkboxField('sleepApnea', 'Sleep Apnea')}
+${checkboxField('homeOxygen', 'Home O₂')}
+${sectionHeader('VASCULAR')}
+${row('Cerebrovascular Disease:', select('cerebrovascularDisease', ['No', 'CVA ≤ 30 days', 'CVA > 30 days', 'CVA timing unk', 'TIA', 'Other CVD']))}
+${checkboxField('pvd', 'Peripheral Artery Disease')}
+${checkboxField('priorCarotidSurgery', 'Prior Carotid Surgery')}
+${checkboxField('rightCarotidStenosis', 'Right Carotid Sten. ≥ 80%')}
+${checkboxField('leftCarotidStenosis', 'Left Carotid Sten. ≥ 80%')}
+${sectionHeader('CARDIAC STATUS')}
+${row('Heart Failure:', select('heartFailure', ['None', 'Yes - Acute', 'Yes - Chronic', 'Yes - Both']))}
+${row('NYHA Classification:', select('nyhaClass', ['Class I', 'Class II', 'Class III', 'Class IV']))}
+${row('PreOp Mech Circ Support:', inputField('mechanicalSupport'))}
+${row('Ejection Fraction (%):', inputField('ejectionFraction', 'number'))}
+${checkboxField('cardiogenicShock', 'Cardiogenic Shock')}
+${checkboxField('resuscitation', 'Resuscitation ≤ 1hr')}
+</table></td>
+<td><table class="sts-col-table">
+${sectionHeader('CORONARY ARTERY DISEASE')}
+${row('Primary Coronary Symptom:', select('primaryCoronarySymptom', ['No coronary symptoms', 'Stable Angina', 'Unstable Angina', 'Non-ST Elevation MI', 'STEMI', 'Angina equivalent', 'Other']))}
+${row('Myocardial Infarction - When:', select('miTiming', ['No MI', '≤ 6 Hrs', '>6 Hrs but <24 Hrs', '1 to 7 Days', '8 to 21 Days', '> 21 Days', 'Unknown time', 'Unknown']))}
+${row('No. of Diseased Vessels:', select('numberOfDiseasedVessels', ['None', 'One', 'Two', 'Three']))}
+${checkboxField('leftMainStenosis', 'Left Main Sten. ≥ 50%')}
+${checkboxField('proximalLADStenosis', 'Proximal LAD Sten. ≥ 70%')}
+${sectionHeader('VALVE DISEASE')}
+${checkboxField('aorticStenosis', 'Aortic Stenosis')}
+${checkboxField('mitralStenosis', 'Mitral Stenosis')}
+${checkboxField('aorticRootAbscess', 'Aortic Root Abscess')}
+${row('Aortic Regurgitation:', select('aorticRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe', 'Unknown']))}
+${row('Mitral Regurgitation:', select('mitralRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe', 'Unknown']))}
+${row('Tricuspid Regurgitation:', select('tricuspidRegurgitation', ['None', 'Trivial/Trace', 'Mild', 'Moderate', 'Severe', 'Unknown']))}
+${sectionHeader('ARRHYTHMIA')}
+${row('Atrial Fibrillation:', select('atrialFibrillation', ['None', 'Remote', 'Recent']))}
+${row('Atrial Flutter:', select('atrialFlutter', ['None', 'Remote', 'Recent']))}
+${row('V. Tach / V. Fib:', select('ventricularArrhythmia', ['None', 'Remote', 'Recent']))}
+${sectionHeader('PREVIOUS CARDIAC INTERVENTIONS')}
+${checkboxField('previousCABG', 'Previous CABG')}
+${checkboxField('previousValve', 'Previous Valve Surgery')}
+${checkboxField('previousPCI', 'Previous PCI')}
+</table></td>
+</tr></table>
+
+<div class="sts-summary">
+<strong>📊 Data Extraction Summary:</strong> <span id="field-count-live">${Object.values(data).filter(v => v !== null && v !== undefined && v !== false && v !== '').length}</span> fields extracted. Yellow highlights = extracted values.
+<br><br>
+<button id="save-sts-changes" style="padding: 8px 16px; background: #003366; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px;">💾 Save Changes & Re-analyze</button>
+<a href="patient-data.html" target="_blank" style="color: #003366; text-decoration: underline;">Open in Standalone Window</a>
+</div>
+</div>`;
+    }
+    
     // Simple markdown to HTML converter
     function markdownToHtml(text) {
       // Convert markdown tables to HTML tables FIRST (before other conversions)
@@ -793,6 +937,14 @@
         if (additionalInfoCtr) {
           additionalInfoCtr.classList.add('hidden');
         }
+        
+        // Reset STS form view to show textarea (not extracted form)
+        const stsNotesInput = document.getElementById('sts-notes-input');
+        const stsExtractedForm = document.getElementById('sts-extracted-form');
+        if (stsNotesInput && stsExtractedForm) {
+          stsNotesInput.classList.remove('hidden');
+          stsExtractedForm.classList.add('hidden');
+        }
       }
       
       // Update analyze button state
@@ -935,7 +1087,7 @@
         if (selectedTool === 'ecmo') {
           requestData = {
             mode: 'notes',
-            data: {
+    data: {
               history: historyTextarea.value.trim(),
               exam: examTextarea.value.trim()
             }
@@ -972,45 +1124,60 @@
         
         // Check if this is an STS report (has the three-tab structure)
         if (selectedTool === 'sts' && data.response.includes('TAB 1:') && data.response.includes('TAB 2:') && data.response.includes('TAB 3:')) {
-          // Parse STS report into three sections
-          const sections = data.response.split(/## 📋 TAB 1:|## 🤖 TAB 2:|## 🔢 TAB 3:/);
+          // Parse STS report into three sections - CORRECT ORDER: 📋 🔢 🤖
+          const sections = data.response.split(/---SECTION---/);
           
           console.log('📊 Split into', sections.length, 'sections');
           
-          // Section 0 is header, sections 1-3 are our tabs
-          const tab1Content = sections[1] ? sections[1].split('---')[0].trim() : '';
-          const tab2Content = sections[2] ? sections[2].split('---')[0].trim() : '';
-          const tab3Content = sections[3] ? sections[3].trim() : '';
+          // Sections: [0] = TAB 1 (Patient Data), [1] = TAB 2 (Manual Calc), [2] = TAB 3 (AI Analysis)
+          const tab1Content = sections[0] ? sections[0].replace(/.*TAB 1:[^\n]*\n/s, '').trim() : '';
+          const tab2Content = sections[1] ? sections[1].replace(/.*TAB 2:[^\n]*\n/s, '').trim() : '';
+          const tab3Content = sections[2] ? sections[2].replace(/.*TAB 3:[^\n]*\n/s, '').trim() : '';
           
-          console.log('📋 Tab 3 content length:', tab3Content.length);
-          console.log('📋 Tab 3 preview:', tab3Content.substring(0, 500));
+          console.log('📋 Tab 1 (Patient Data) content length:', tab1Content.length);
+          console.log('🔢 Tab 2 (Manual Calc) content length:', tab2Content.length);
+          console.log('🤖 Tab 3 (AI Analysis) content length:', tab3Content.length);
           
-          // Display patient data tab
-          document.getElementById('patient-data-text').innerHTML = markdownToHtml(tab1Content);
-          document.getElementById('patient-data-empty').classList.add('hidden');
-          document.getElementById('patient-data-content').classList.remove('hidden');
+          // Store structured data and render form in the same tab
+          if (data.structuredData) {
+            console.log('💾 Storing structured data:', Object.keys(data.structuredData).length, 'fields');
+            localStorage.setItem('stsPatientData', JSON.stringify(data.structuredData));
+            
+            // Hide the textarea input and show the extracted form
+            document.getElementById('sts-notes-input').classList.add('hidden');
+            document.getElementById('sts-extracted-form').classList.remove('hidden');
+            
+            // Generate and display the form
+            document.getElementById('sts-form-content').innerHTML = generateSTSFormInTab(data.structuredData);
+            
+            // Attach event listeners to form fields
+            attachSTSFormListeners();
+            attachSaveSTSButton();
+          } else {
+            console.warn('⚠️ No structuredData in response');
+          }
           
-          // Display AI analysis tab
-          document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab2Content);
-          document.getElementById('ai-analysis-empty').classList.add('hidden');
-          document.getElementById('ai-analysis-content').classList.remove('hidden');
-          
-          // Display manual calculations tab
-          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab3Content);
+          // Display manual calculations tab - Tab 2 content
+          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
           document.getElementById('manual-calc-empty').classList.add('hidden');
           document.getElementById('manual-calc-content').classList.remove('hidden');
           
-          // Switch to patient data results tab
-          document.querySelector('[data-tab="patient-data-results"]').click();
+          // Display AI analysis tab - Tab 3 content
+          document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab3Content);
+          document.getElementById('ai-analysis-empty').classList.add('hidden');
+          document.getElementById('ai-analysis-content').classList.remove('hidden');
+          
+          // Stay on the Patient Data tab (input tab) to show the form
+          // No need to switch tabs - form replaces textarea in same view
         } else {
           // ECMO or other tool - use legacy single results tab
           resultText.innerHTML = markdownToHtml(data.response);
-          resultsEmpty.classList.add('hidden');
-          resultsContent.classList.remove('hidden');
-          document.querySelector('[data-tab="results"]').click();
+  resultsEmpty.classList.add('hidden');
+  resultsContent.classList.remove('hidden');
+  document.querySelector('[data-tab="results"]').click();
         }
 
-        document.getElementById('survey-section').classList.remove('hidden');
+  document.getElementById('survey-section').classList.remove('hidden');
 
       } catch (error) {
         console.error('Error analyzing notes:', error);
@@ -1025,6 +1192,144 @@
       }
     });
 
+    // STS Form field change tracking
+    let stsFormData = {};
+    
+    function attachSTSFormListeners() {
+      const formContainer = document.getElementById('sts-form-content');
+      if (!formContainer) return;
+      
+      // Get all inputs, selects, and checkboxes with data-field attribute
+      const fields = formContainer.querySelectorAll('[data-field]');
+      
+      fields.forEach(field => {
+        const fieldName = field.getAttribute('data-field');
+        
+        // Initialize data
+        if (field.type === 'checkbox') {
+          stsFormData[fieldName] = field.checked;
+        } else {
+          stsFormData[fieldName] = field.value;
+        }
+        
+        // Add change listener
+        field.addEventListener('change', (e) => {
+          if (field.type === 'checkbox') {
+            stsFormData[fieldName] = field.checked;
+          } else {
+            stsFormData[fieldName] = field.value;
+          }
+          
+          // Update field count
+          const filledCount = Object.values(stsFormData).filter(v => v !== null && v !== undefined && v !== false && v !== '').length;
+          const countSpan = document.getElementById('field-count-live');
+          if (countSpan) {
+            countSpan.textContent = filledCount;
+          }
+          
+          // Update localStorage
+          localStorage.setItem('stsPatientData', JSON.stringify(stsFormData));
+          
+          console.log(`Field ${fieldName} updated:`, stsFormData[fieldName]);
+        });
+      });
+    }
+    
+    // Save & Re-analyze button functionality
+    function attachSaveSTSButton() {
+      const saveButton = document.getElementById('save-sts-changes');
+      if (!saveButton) return;
+      
+      saveButton.addEventListener('click', async () => {
+        // Disable button during processing
+        saveButton.disabled = true;
+        saveButton.textContent = '⏳ Re-analyzing...';
+        
+        try {
+          // Get the original patient notes
+          const patientNotes = patientNotesTextarea ? patientNotesTextarea.value.trim() : '';
+          
+          if (!patientNotes) {
+            alert('Original patient notes not found. Please start over.');
+            return;
+          }
+          
+          // Send updated data to backend
+          const response = await fetch('/api/sts-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              patientNotes: patientNotes,
+              manualOverrides: stsFormData // Send the manually edited data
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Parse and update all tabs (NEW ORDER: Patient Data, Manual Calc, AI Analysis)
+          const sections = data.response.split(/---SECTION---/);
+          const tab1Content = sections[0] ? sections[0].replace(/.*TAB 1:[^\n]*\n/s, '').trim() : ''; // Patient Data
+          const tab2Content = sections[1] ? sections[1].replace(/.*TAB 2:[^\n]*\n/s, '').trim() : ''; // Manual Calculations
+          const tab3Content = sections[2] ? sections[2].replace(/.*TAB 3:[^\n]*\n/s, '').trim() : ''; // AI Analysis
+          
+          console.log('🔄 Re-analysis Tab 2 length:', tab2Content.length);
+          console.log('🔄 Re-analysis Tab 3 length:', tab3Content.length);
+          
+          // Update form with new structured data
+          if (data.structuredData) {
+            stsFormData = data.structuredData;
+            localStorage.setItem('stsPatientData', JSON.stringify(data.structuredData));
+            document.getElementById('sts-form-content').innerHTML = generateSTSFormInTab(data.structuredData);
+            attachSTSFormListeners();
+            attachSaveSTSButton();
+          }
+          
+          // Update manual calculations tab - Tab 2 content
+          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
+          document.getElementById('manual-calc-empty').classList.add('hidden');
+          document.getElementById('manual-calc-content').classList.remove('hidden');
+          
+          // Update AI analysis tab - Tab 3 content
+          document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab3Content);
+          document.getElementById('ai-analysis-empty').classList.add('hidden');
+          document.getElementById('ai-analysis-content').classList.remove('hidden');
+          
+          // Show success message
+          alert('✅ Analysis updated successfully!');
+          
+        } catch (error) {
+          console.error('Error re-analyzing:', error);
+          alert('❌ Error updating analysis. Please try again.');
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = '💾 Save Changes & Re-analyze';
+        }
+      });
+    }
+    
+    // Edit STS Notes button functionality
+    const editSTSNotesButton = document.getElementById('edit-sts-notes');
+    if (editSTSNotesButton) {
+      editSTSNotesButton.addEventListener('click', () => {
+        // Show textarea and hide form
+        document.getElementById('sts-notes-input').classList.remove('hidden');
+        document.getElementById('sts-extracted-form').classList.add('hidden');
+        
+        // Clear AI analysis and manual calc tabs
+        document.getElementById('ai-analysis-text').innerHTML = '';
+        document.getElementById('ai-analysis-empty').classList.remove('hidden');
+        document.getElementById('ai-analysis-content').classList.add('hidden');
+        
+        document.getElementById('manual-calc-text').innerHTML = '';
+        document.getElementById('manual-calc-empty').classList.remove('hidden');
+        document.getElementById('manual-calc-content').classList.add('hidden');
+      });
+    }
+    
     // Help modal functionality
     const helpButton = document.getElementById('help-button');
     const helpModal = document.getElementById('help-modal');

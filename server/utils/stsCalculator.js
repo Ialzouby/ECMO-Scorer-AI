@@ -107,7 +107,7 @@ function calculateSTSRisk(patientData) {
  * Based on key risk factors with approximate coefficients
  */
 function calculateCABGMortalityDetailed(data) {
-  let logit = -5.3; // Baseline intercept calibrated for 2.67% mortality with typical risk profile
+  let logit = -6.0; // Baseline intercept (calibrated to match typical STS baseline risk ~2-3% with standard risk factors)
   const steps = [];
   
   steps.push({
@@ -157,12 +157,12 @@ function calculateCABGMortalityDetailed(data) {
   
   // Gender
   if (data.gender?.toLowerCase() === 'female') {
-    logit += 0.45;
+    logit += 0.3;
     steps.push({
       variable: 'Female Gender',
       value: 'Female',
-      coefficient: 0.45,
-      contribution: 0.45,
+      coefficient: 0.3,
+      contribution: 0.3,
       description: 'Female patients have moderately higher risk'
     });
   }
@@ -192,33 +192,33 @@ function calculateCABGMortalityDetailed(data) {
   
   // Diabetes - check if diabetes exists and is not "No"
   if (data.diabetes && data.diabetes.toString().toLowerCase() !== 'no') {
-    logit += 0.35;
+    logit += 0.2;
     steps.push({
       variable: 'Diabetes',
       value: data.diabetes,
-      coefficient: 0.35,
-      contribution: 0.35,
+      coefficient: 0.2,
+      contribution: 0.2,
       description: 'Diabetes increases wound infection and recovery time'
     });
   }
   
   // Renal Function (creatinine or dialysis)
   if (data.dialysis) {
-    logit += 0.9;
+    logit += 1.2;
     steps.push({
       variable: 'Dialysis',
       value: 'Yes',
-      coefficient: 0.9,
-      contribution: 0.9,
+      coefficient: 1.2,
+      contribution: 1.2,
       description: 'Dialysis-dependent renal failure - major risk factor'
     });
   } else if (data.creatinine && data.creatinine > 2.0) {
-    logit += 0.5;
+    logit += 0.6;
     steps.push({
       variable: 'Elevated Creatinine',
       value: data.creatinine + ' mg/dL',
-      coefficient: 0.5,
-      contribution: 0.5,
+      coefficient: 0.6,
+      contribution: 0.6,
       description: 'Renal dysfunction (Creatinine > 2.0)'
     });
   }
@@ -439,9 +439,9 @@ function calculateCABGMortality(data) {
  * Calculate CABG Morbidity Risk
  */
 function calculateCABGMorbidity(data) {
-  // Morbidity typically 3-4x mortality rate (calibrated to match STS)
+  // Morbidity typically 3-5x mortality rate
   const mortality = parseFloat(calculateCABGMortality(data));
-  return (mortality * 3.39).toFixed(2);
+  return (mortality * 4).toFixed(2);
 }
 
 /**
@@ -750,15 +750,15 @@ function categorizeRisk(mortalityPercent) {
  * Based on STS stroke model coefficients
  */
 function calculateCABGStroke(data) {
-  let logit = -5.8; // Baseline intercept calibrated for ~1.2% stroke risk
+  let logit = -5.5; // Baseline intercept for stroke
   
-  if (data.age && data.age > 70) logit += (data.age - 70) * 0.03;
-  if (data.gender?.toLowerCase() === 'female') logit += 0.25;
-  if (data.diabetes) logit += 0.3;
-  if (data.hypertension) logit += 0.25;
-  if (data.pvd || data.peripheralVascularDisease) logit += 0.4;
-  if (data.priorStroke || data.cerebrovascularDisease) logit += 0.8;
-  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.5;
+  if (data.age && data.age > 70) logit += (data.age - 70) * 0.04;
+  if (data.gender?.toLowerCase() === 'female') logit += 0.15;
+  if (data.diabetes) logit += 0.2;
+  if (data.hypertension) logit += 0.15;
+  if (data.pvd || data.peripheralVascularDisease) logit += 0.3;
+  if (data.priorStroke || data.cerebrovascularDisease) logit += 0.6;
+  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.4;
   
   const probability = 1 / (1 + Math.exp(-logit));
   return (probability * 100).toFixed(2);
@@ -795,14 +795,14 @@ function calculateCABGRenalFailure(data) {
  * Defined as return to OR for any reason
  */
 function calculateCABGReoperation(data) {
-  let logit = -4.2; // Baseline intercept calibrated for ~2.9% reoperation risk
+  let logit = -4.0; // Baseline intercept for reoperation
   
-  if (data.age && data.age > 75) logit += 0.3;
-  if (data.gender?.toLowerCase() === 'female') logit += 0.3;
-  if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.5;
-  if (data.dialysis) logit += 0.6;
-  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.8;
-  if (data.reoperation || data.priorCardiacSurgery) logit += 0.7;
+  if (data.age && data.age > 75) logit += 0.25;
+  if (data.gender?.toLowerCase() === 'female') logit += 0.2;
+  if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.4;
+  if (data.dialysis) logit += 0.5;
+  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.7;
+  if (data.reoperation || data.priorCardiacSurgery) logit += 0.6;
   
   const probability = 1 / (1 + Math.exp(-logit));
   return (probability * 100).toFixed(2);
@@ -813,16 +813,16 @@ function calculateCABGReoperation(data) {
  * Defined as mechanical ventilation >24 hours
  */
 function calculateCABGProlongedVentilation(data) {
-  let logit = -3.4; // Baseline intercept calibrated for ~5.2% prolonged vent risk
+  let logit = -4.2; // Baseline intercept
   
-  if (data.age && data.age > 70) logit += (data.age - 70) * 0.025;
-  if (data.gender?.toLowerCase() === 'female') logit += 0.35;
-  if (data.bmi && data.bmi > 35) logit += 0.5;
-  if (data.copd || data.chronicLungDisease) logit += 0.7;
-  if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.6;
-  if (data.dialysis) logit += 0.8;
-  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.9;
-  if (data.cardiogenicShock) logit += 1.2;
+  if (data.age && data.age > 70) logit += (data.age - 70) * 0.03;
+  if (data.gender?.toLowerCase() === 'female') logit += 0.25;
+  if (data.bmi && data.bmi > 35) logit += 0.4;
+  if (data.copd || data.chronicLungDisease) logit += 0.6;
+  if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.5;
+  if (data.dialysis) logit += 0.7;
+  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.8;
+  if (data.cardiogenicShock) logit += 1.0;
   
   const probability = 1 / (1 + Math.exp(-logit));
   return (probability * 100).toFixed(2);
@@ -832,14 +832,14 @@ function calculateCABGProlongedVentilation(data) {
  * Calculate CABG Deep Sternal Wound Infection Risk
  */
 function calculateCABGDeepSternalWoundInfection(data) {
-  let logit = -6.1; // Baseline intercept calibrated for ~0.6% infection risk
+  let logit = -6.0; // Baseline intercept (low baseline ~0.5%)
   
-  if (data.gender?.toLowerCase() === 'female') logit += 0.4;
-  if (data.bmi && data.bmi > 30) logit += 0.6;
-  if (data.diabetes) logit += 0.5;
-  if (data.copd) logit += 0.4;
-  if (data.reoperation || data.priorCardiacSurgery) logit += 0.5;
-  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.4;
+  if (data.gender?.toLowerCase() === 'female') logit += 0.3;
+  if (data.bmi && data.bmi > 30) logit += 0.5;
+  if (data.diabetes) logit += 0.4;
+  if (data.copd) logit += 0.3;
+  if (data.reoperation || data.priorCardiacSurgery) logit += 0.4;
+  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.3;
   
   const probability = 1 / (1 + Math.exp(-logit));
   return (probability * 100).toFixed(3); // Use 3 decimals for precision
@@ -850,16 +850,16 @@ function calculateCABGDeepSternalWoundInfection(data) {
  * Defined as >14 days
  */
 function calculateCABGLongHospitalStay(data) {
-  let logit = -3.5; // Baseline intercept calibrated for ~4.9% long stay risk
+  let logit = -3.8; // Baseline intercept
   
-  if (data.age && data.age > 75) logit += 0.45;
-  if (data.gender?.toLowerCase() === 'female') logit += 0.3;
-  if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.7;
-  if (data.dialysis) logit += 0.9;
-  if (data.copd) logit += 0.5;
-  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.8;
-  if (data.cardiogenicShock) logit += 1.2;
-  if (data.reoperation || data.priorCardiacSurgery) logit += 0.6;
+  if (data.age && data.age > 75) logit += 0.4;
+  if (data.gender?.toLowerCase() === 'female') logit += 0.2;
+  if (data.ejectionFraction && data.ejectionFraction < 30) logit += 0.6;
+  if (data.dialysis) logit += 0.8;
+  if (data.copd) logit += 0.4;
+  if (data.priority?.toLowerCase().includes('emerg')) logit += 0.7;
+  if (data.cardiogenicShock) logit += 1.0;
+  if (data.reoperation || data.priorCardiacSurgery) logit += 0.5;
   
   const probability = 1 / (1 + Math.exp(-logit));
   return (probability * 100).toFixed(2);
@@ -870,21 +870,21 @@ function calculateCABGLongHospitalStay(data) {
  * Defined as <6 days (this is a POSITIVE outcome - higher is better)
  */
 function calculateCABGShortHospitalStay(data) {
-  let logit = -0.7; // Baseline intercept calibrated for ~33% short stay probability
+  let logit = -0.5; // Baseline intercept (baseline ~38% chance)
   
   // Younger age INCREASES probability of short stay
-  if (data.age && data.age < 60) logit += 0.3;
-  else if (data.age && data.age > 75) logit -= 0.6;
+  if (data.age && data.age < 60) logit += 0.4;
+  else if (data.age && data.age > 75) logit -= 0.5;
   
   // These factors DECREASE probability of short stay
-  if (data.gender?.toLowerCase() === 'female') logit -= 0.25;
-  if (data.ejectionFraction && data.ejectionFraction < 40) logit -= 0.5;
-  if (data.dialysis) logit -= 0.9;
-  if (data.copd) logit -= 0.4;
-  if (data.diabetes) logit -= 0.25;
-  if (data.priority?.toLowerCase().includes('emerg')) logit -= 0.7;
-  if (data.cardiogenicShock) logit -= 1.4;
-  if (data.reoperation || data.priorCardiacSurgery) logit -= 0.5;
+  if (data.gender?.toLowerCase() === 'female') logit -= 0.2;
+  if (data.ejectionFraction && data.ejectionFraction < 40) logit -= 0.4;
+  if (data.dialysis) logit -= 0.8;
+  if (data.copd) logit -= 0.3;
+  if (data.diabetes) logit -= 0.2;
+  if (data.priority?.toLowerCase().includes('emerg')) logit -= 0.6;
+  if (data.cardiogenicShock) logit -= 1.2;
+  if (data.reoperation || data.priorCardiacSurgery) logit -= 0.4;
   
   const probability = 1 / (1 + Math.exp(-logit));
   return (probability * 100).toFixed(1); // One decimal

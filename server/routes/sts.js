@@ -153,7 +153,7 @@ ${checkboxField('previousPCI', 'Previous PCI')}
 router.post('/', async (req, res) => {
   const { mode, data } = req.body;
 
-  if (!mode | !data) {
+  if (!mode || !data) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
@@ -161,7 +161,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Invalid mode' });
   }
 
-  const patientNotes = data.patientNotes | data.history | '';
+  const patientNotes = data.patientNotes || data.history || '';
   
   if (!patientNotes) {
     return res.status(400).json({ error: 'Patient notes required' });
@@ -354,7 +354,7 @@ Return ONLY the JSON object. Extract everything possible, use null for missing d
           logitSum = parseFloat(s.contribution);
           return;
         }
-        if (s.variable.includes('LOGISTIC TRANSFORMATION') | s.variable.includes('FINAL MORTALITY')) {
+        if (s.variable.includes('LOGISTIC TRANSFORMATION') || s.variable.includes('FINAL MORTALITY')) {
           if (s.variable.includes('LOGISTIC TRANSFORMATION')) {
             finalProbability = parseFloat(s.contribution);
           }
@@ -362,7 +362,7 @@ Return ONLY the JSON object. Extract everything possible, use null for missing d
         }
         
         // Format calculation field
-        let calcDisplay = s.calculation | '-';
+        let calcDisplay = s.calculation || '-';
         if (!s.calculation && s.coefficient !== '-' && s.variable !== 'Baseline Intercept') {
           calcDisplay = `${s.coefficient} × 1 = ${s.contribution}`;
         } else if (s.variable === 'Baseline Intercept') {
@@ -475,7 +475,7 @@ Be specific, analytical, and highlight any important differences between the mat
 
 ${stsForm}
 
----SECTION---
+---
 
 ## 🔢 TAB 2: MANUAL MATHEMATICAL CALCULATIONS
 
@@ -484,6 +484,8 @@ ${stsForm}
 **Model Type:** ${structuredData.procedureType || 'General'} Risk Model  
 **Method:** Deterministic Logistic Regression with Published STS Coefficients  
 **Calculation Type:** Algorithmic (non-AI)
+
+---
 
 ${mathTable}
 

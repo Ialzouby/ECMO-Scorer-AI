@@ -1124,15 +1124,14 @@ ${checkboxField('previousPCI', 'Previous PCI')}
         
         // Check if this is an STS report (has the three-tab structure)
         if (selectedTool === 'sts' && data.response.includes('TAB 1:') && data.response.includes('TAB 2:') && data.response.includes('TAB 3:')) {
-          // Parse STS report into three sections - CORRECT ORDER: 📋 🔢 🤖
-          const sections = data.response.split(/---SECTION---/);
+          // Extract each tab by finding the markers
+          const tab1Match = data.response.match(/## 📋 TAB 1:.*?\n\n(.*?)(?=## 🔢 TAB 2:|$)/s);
+          const tab2Match = data.response.match(/## 🔢 TAB 2:.*?\n\n(.*?)(?=---SECTION---|$)/s);
+          const tab3Match = data.response.match(/## 🤖 TAB 3:.*?\n\n(.*?)(?=---\n\n### Methodology|$)/s);
           
-          console.log('📊 Split into', sections.length, 'sections');
-          
-          // Sections: [0] = TAB 1 (Patient Data), [1] = TAB 2 (Manual Calc), [2] = TAB 3 (AI Analysis)
-          const tab1Content = sections[0] ? sections[0].replace(/.*TAB 1:[^\n]*\n/s, '').trim() : '';
-          const tab2Content = sections[1] ? sections[1].replace(/.*TAB 2:[^\n]*\n/s, '').trim() : '';
-          const tab3Content = sections[2] ? sections[2].replace(/.*TAB 3:[^\n]*\n/s, '').trim() : '';
+          const tab1Content = tab1Match ? tab1Match[1].trim() : '';
+          const tab2Content = tab2Match ? tab2Match[1].trim() : '';
+          const tab3Content = tab3Match ? tab3Match[1].trim() : '';
           
           console.log('📋 Tab 1 (Patient Data) content length:', tab1Content.length);
           console.log('🔢 Tab 2 (Manual Calc) content length:', tab2Content.length);
@@ -1157,15 +1156,15 @@ ${checkboxField('previousPCI', 'Previous PCI')}
             console.warn('⚠️ No structuredData in response');
           }
           
-          // Display manual calculations tab - Tab 2 content
-          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
-          document.getElementById('manual-calc-empty').classList.add('hidden');
-          document.getElementById('manual-calc-content').classList.remove('hidden');
-          
           // Display AI analysis tab - Tab 3 content
           document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab3Content);
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
+          
+          // Display manual calculations tab - Tab 2 content
+          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
+          document.getElementById('manual-calc-empty').classList.add('hidden');
+          document.getElementById('manual-calc-content').classList.remove('hidden');
           
           // Stay on the Patient Data tab (input tab) to show the form
           // No need to switch tabs - form replaces textarea in same view
@@ -1270,14 +1269,14 @@ ${checkboxField('previousPCI', 'Previous PCI')}
           
           const data = await response.json();
           
-          // Parse and update all tabs (NEW ORDER: Patient Data, Manual Calc, AI Analysis)
-          const sections = data.response.split(/---SECTION---/);
-          const tab1Content = sections[0] ? sections[0].replace(/.*TAB 1:[^\n]*\n/s, '').trim() : ''; // Patient Data
-          const tab2Content = sections[1] ? sections[1].replace(/.*TAB 2:[^\n]*\n/s, '').trim() : ''; // Manual Calculations
-          const tab3Content = sections[2] ? sections[2].replace(/.*TAB 3:[^\n]*\n/s, '').trim() : ''; // AI Analysis
+          // Extract each tab by finding the markers
+          const tab1Match = data.response.match(/## 📋 TAB 1:.*?\n\n(.*?)(?=## 🔢 TAB 2:|$)/s);
+          const tab2Match = data.response.match(/## 🔢 TAB 2:.*?\n\n(.*?)(?=---SECTION---|$)/s);
+          const tab3Match = data.response.match(/## 🤖 TAB 3:.*?\n\n(.*?)(?=---\n\n### Methodology|$)/s);
           
-          console.log('🔄 Re-analysis Tab 2 length:', tab2Content.length);
-          console.log('🔄 Re-analysis Tab 3 length:', tab3Content.length);
+          const tab1Content = tab1Match ? tab1Match[1].trim() : '';
+          const tab2Content = tab2Match ? tab2Match[1].trim() : '';
+          const tab3Content = tab3Match ? tab3Match[1].trim() : '';
           
           // Update form with new structured data
           if (data.structuredData) {
@@ -1288,15 +1287,15 @@ ${checkboxField('previousPCI', 'Previous PCI')}
             attachSaveSTSButton();
           }
           
-          // Update manual calculations tab - Tab 2 content
-          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
-          document.getElementById('manual-calc-empty').classList.add('hidden');
-          document.getElementById('manual-calc-content').classList.remove('hidden');
-          
           // Update AI analysis tab - Tab 3 content
           document.getElementById('ai-analysis-text').innerHTML = markdownToHtml(tab3Content);
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
+          
+          // Update manual calculations tab - Tab 2 content
+          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
+          document.getElementById('manual-calc-empty').classList.add('hidden');
+          document.getElementById('manual-calc-content').classList.remove('hidden');
           
           // Show success message
           alert('✅ Analysis updated successfully!');

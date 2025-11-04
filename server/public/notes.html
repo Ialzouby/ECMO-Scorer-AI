@@ -770,6 +770,54 @@ ${checkboxField('previousPCI', 'Previous PCI')}
 </div>`;
     }
     
+    // Special function to render Manual Calculations with card layout
+    function renderManualCalculationsWithCards(text) {
+      // First convert markdown to HTML
+      let html = markdownToHtml(text);
+      
+      // Split content by h3 headers to create cards for each step
+      const sections = html.split(/<h3[^>]*>/);
+      
+      if (sections.length <= 1) {
+        // No sections found, return as is
+        return html;
+      }
+      
+      let cardHtml = '<div class="space-y-4">';
+      
+      // First section is before any h3 (usually empty or intro text)
+      if (sections[0].trim()) {
+        cardHtml += `<div class="mb-6">${sections[0]}</div>`;
+      }
+      
+      // Process each section as a card
+      for (let i = 1; i < sections.length; i++) {
+        const section = sections[i];
+        // Extract the header text and content
+        const headerMatch = section.match(/^(.+?)<\/h3>(.*)/s);
+        
+        if (headerMatch) {
+          const headerText = headerMatch[1];
+          const content = headerMatch[2];
+          
+          cardHtml += `
+            <div class="card p-5 hover:shadow-md transition-shadow duration-200 border-l-4 border-primary-500">
+              <h3 class="text-base font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold">${i}</span>
+                ${headerText}
+              </h3>
+              <div class="text-sm text-gray-700 dark:text-gray-300 prose prose-sm dark:prose-invert max-w-none">
+                ${content}
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      cardHtml += '</div>';
+      return cardHtml;
+    }
+    
     // Simple markdown to HTML converter
     function markdownToHtml(text) {
       // Convert markdown tables to HTML tables FIRST (before other conversions)
@@ -1161,8 +1209,8 @@ ${checkboxField('previousPCI', 'Previous PCI')}
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
           
-          // Display manual calculations tab - Tab 2 content
-          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
+          // Display manual calculations tab - Tab 2 content with card layout
+          document.getElementById('manual-calc-text').innerHTML = renderManualCalculationsWithCards(tab2Content);
           document.getElementById('manual-calc-empty').classList.add('hidden');
           document.getElementById('manual-calc-content').classList.remove('hidden');
           
@@ -1292,8 +1340,8 @@ ${checkboxField('previousPCI', 'Previous PCI')}
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
           
-          // Update manual calculations tab - Tab 2 content
-          document.getElementById('manual-calc-text').innerHTML = markdownToHtml(tab2Content);
+          // Update manual calculations tab - Tab 2 content with card layout
+          document.getElementById('manual-calc-text').innerHTML = renderManualCalculationsWithCards(tab2Content);
           document.getElementById('manual-calc-empty').classList.add('hidden');
           document.getElementById('manual-calc-content').classList.remove('hidden');
           

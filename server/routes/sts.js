@@ -151,8 +151,297 @@ ${checkboxField('previousPCI', 'Previous PCI')}
 }
 
 router.post('/', async (req, res) => {
-  const { mode, data } = req.body;
+  const { mode, data, patientNotes, manualOverrides } = req.body;
 
+  // Handle re-analysis with manual overrides
+  if (manualOverrides && patientNotes) {
+    console.log('🔄 Re-analysis with manual overrides detected...');
+    try {
+      const structuredData = manualOverrides;
+      
+      console.log('🔢 Stage 2B: Mathematical calculation with overrides...');
+      const mathResult = calculateSTSRisk(structuredData);
+
+      // Format results as clean table similar to official STS calculator
+      let mathTable = `
+### 🔬 CALCULATED PERIOPERATIVE RISK ESTIMATES
+
+**Model Type:** ${structuredData.procedureType || 'STS CABG'} Risk Model  
+**Method:** Published STS Logistic Regression Coefficients (2018)  
+
+| PERIOPERATIVE OUTCOME | ESTIMATE % |
+|---|---|
+| **Operative Mortality** | **${mathResult.mortality}%** |
+| **Morbidity & Mortality** | **${mathResult.morbidity || 'Not calculated'}%** |`;
+
+      // Add additional outcomes if available (CABG only)
+      if (mathResult.stroke) {
+        mathTable += `
+| **Stroke** | **${mathResult.stroke}%** |`;
+      }
+      
+      if (mathResult.renalFailure) {
+        mathTable += `
+| **Renal Failure** | **${mathResult.renalFailure}** |`;
+      }
+      
+      if (mathResult.reoperation) {
+        mathTable += `
+| **Reoperation** | **${mathResult.reoperation}%** |`;
+      }
+      
+      if (mathResult.prolongedVentilation) {
+        mathTable += `
+| **Prolonged Ventilation** | **${mathResult.prolongedVentilation}%** |`;
+      }
+      
+      if (mathResult.deepSternalWoundInfection) {
+        mathTable += `
+| **Deep Sternal Wound Infection** | **${mathResult.deepSternalWoundInfection}%** |`;
+      }
+      
+      if (mathResult.longHospitalStay) {
+        mathTable += `
+| **Long Hospital Stay (> 14 days)** | **${mathResult.longHospitalStay}%** |`;
+      }
+      
+      if (mathResult.shortHospitalStay) {
+        mathTable += `
+| **Short Hospital Stay (<6 days)*** | **${mathResult.shortHospitalStay}%** |`;
+      }
+      
+      mathTable += `\n\n**Risk Category:** ${mathResult.riskCategory}  \n**Calculation Confidence:** ${mathResult.confidence}\n\n`;
+      
+      // Helper function to format detailed calculation steps for any outcome
+      function formatDetailedCalculation(steps, outcomeName, outcomeIcon) {
+        if (!steps || steps.length === 0) return '';
+        
+        let output = `---\n\n### ${outcomeIcon} DETAILED CALCULATION: ${outcomeName}\n\n`;
+        output += `This section shows the step-by-step mathematical calculation for **${outcomeName}** using logistic regression.\n\n`;
+        output += `**Formula:** P(outcome) = 1 / (1 + e^(-logit))  \n**Where:** logit = intercept + Σ(coefficient × risk_factor)\n\n`;
+        output += `---\n\n`;
+        output += `#### Risk Factor Contributions\n\n`;
+        output += `| Step | Risk Factor | Patient Value | Coefficient | Calculation | Logit Contribution |\n|---|---|---|---|---|---|\n`;
+        
+        let stepNum = 1;
+        let logitSum = 0;
+        let finalProbability = null;
+        
+        steps.forEach(s => {
+          // Skip the final transformation steps for now
+          if (s.variable.includes('TOTAL LOGIT')) {
+            logitSum = parseFloat(s.contribution);
+            return;
+          }
+          if (s.variable.includes('LOGISTIC TRANSFORMATION') || s.variable.includes('FINAL')) {
+            if (s.variable.includes('LOGISTIC TRANSFORMATION')) {
+              finalProbability = parseFloat(s.contribution);
+            }
+            return;
+          }
+          
+          // Format calculation field
+          let calcDisplay = s.calculation || '-';
+          if (!s.calculation && s.coefficient !== '-' && s.variable !== 'Baseline Intercept') {
+            calcDisplay = `${s.coefficient} × 1 = ${s.contribution}`;
+          } else if (s.variable === 'Baseline Intercept') {
+            calcDisplay = `Intercept = ${s.contribution}`;
+          }
+          
+          output += `| ${stepNum} | **${s.variable}** | ${s.value || 'N/A'} | ${s.coefficient} | ${calcDisplay} | **${s.contribution}** |\n`;
+          stepNum++;
+        });
+        
+        // Add summary steps
+        const totalLogitStep = steps.find(s => s.variable.includes('TOTAL LOGIT'));
+        if (totalLogitStep) {
+          output += `\n#### Total Logit (Sum of All Contributions)\n\n`;
+          output += `**Total Logit = ${totalLogitStep.contribution}**\n\n`;
+        }
+        
+        const logisticStep = steps.find(s => s.variable.includes('LOGISTIC TRANSFORMATION'));
+        if (logisticStep) {
+          output += `#### Logistic Transformation\n\n`;
+          output += `**P = 1 / (1 + e^(-${logitSum.toFixed(3)})) = ${finalProbability ? finalProbability.toFixed(6) : logisticStep.contribution}**\n\n`;
+        }
+        
+        const finalStep = steps.find(s => s.variable.includes('FINAL'));
+        if (finalStep) {
+          output += `#### Final Risk Estimate\n\n`;
+          output += `**${outcomeName} Risk = ${finalStep.contribution}**\n\n`;
+        }
+        
+        return output;
+      }
+      
+      // Add detailed step-by-step calculations for ALL outcomes
+      if (mathResult.detailedSteps && mathResult.detailedSteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.detailedSteps, 'Operative Mortality', '💀');
+      }
+      
+      if (mathResult.morbiditySteps && mathResult.morbiditySteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.morbiditySteps, 'Morbidity & Mortality (PROMM)', '⚕️');
+      }
+      
+      if (mathResult.strokeSteps && mathResult.strokeSteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.strokeSteps, 'Stroke', '🧠');
+      }
+      
+      if (mathResult.renalFailureSteps && mathResult.renalFailureSteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.renalFailureSteps, 'Renal Failure', '🫘');
+      }
+      
+      if (mathResult.reoperationSteps && mathResult.reoperationSteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.reoperationSteps, 'Reoperation', '🔄');
+      }
+      
+      if (mathResult.prolongedVentilationSteps && mathResult.prolongedVentilationSteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.prolongedVentilationSteps, 'Prolonged Ventilation (>24 hrs)', '🫁');
+      }
+      
+      if (mathResult.deepSternalWoundInfectionSteps && mathResult.deepSternalWoundInfectionSteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.deepSternalWoundInfectionSteps, 'Deep Sternal Wound Infection', '🦠');
+      }
+      
+      if (mathResult.longHospitalStaySteps && mathResult.longHospitalStaySteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.longHospitalStaySteps, 'Long Hospital Stay (>14 days)', '🏥');
+      }
+      
+      if (mathResult.shortHospitalStaySteps && mathResult.shortHospitalStaySteps.length > 0) {
+        mathTable += formatDetailedCalculation(mathResult.shortHospitalStaySteps, 'Short Hospital Stay (<6 days)', '✨');
+      }
+      
+      const stsForm = generateSTSFormHTML(structuredData);
+      
+      // Prepare manual calculation summary for AI
+      const manualCalculationSummary = `
+**Manual Mathematical Model Results (ALL STS OUTCOMES):**
+
+| Outcome | Calculated Risk |
+|---|---|
+| Operative Mortality (PROM) | ${mathResult.mortality}% |
+| Morbidity & Mortality (PROMM) | ${mathResult.morbidity}% |
+${mathResult.stroke ? `| Stroke | ${mathResult.stroke}% |` : ''}
+${mathResult.renalFailure ? `| Renal Failure | ${mathResult.renalFailure} |` : ''}
+${mathResult.reoperation ? `| Reoperation | ${mathResult.reoperation}% |` : ''}
+${mathResult.prolongedVentilation ? `| Prolonged Ventilation | ${mathResult.prolongedVentilation}% |` : ''}
+${mathResult.deepSternalWoundInfection ? `| Deep Sternal Wound Infection | ${mathResult.deepSternalWoundInfection}% |` : ''}
+${mathResult.longHospitalStay ? `| Long Hospital Stay (>14d) | ${mathResult.longHospitalStay}% |` : ''}
+${mathResult.shortHospitalStay ? `| Short Hospital Stay (<6d) | ${mathResult.shortHospitalStay}% |` : ''}
+
+**Risk Category:** ${mathResult.riskCategory}
+**Model Type:** ${structuredData.procedureType || 'STS CABG'} Risk Model
+
+**Key Risk Factors:**
+${mathResult.detailedSteps ? mathResult.detailedSteps.slice(1, 8).map(s => `- ${s.variable}: ${s.contribution}`).join('\n') : 'Detailed steps available'}
+`;
+
+      console.log('🤖 Stage 2A: AI risk estimation with manual calculation comparison...');
+      
+      const aiPrompt = `You are a cardiac surgery risk assessment specialist. You have been provided with both patient data and the manual mathematical calculation results from the official STS risk model.
+
+**Patient Data (Structured - MANUALLY EDITED):**
+${JSON.stringify(structuredData, null, 2)}
+
+${manualCalculationSummary}
+
+Your task is to:
+1. **ANALYZE THE MANUAL CALCULATIONS**: Review the mathematically calculated risks
+2. **COMPARE WITH YOUR ASSESSMENT**: Provide your own clinical risk assessment
+3. **IDENTIFY DISCREPANCIES**: If your assessment differs from the manual calculation, explain why
+4. **VALIDATE OR QUESTION**: Do the manual calculations align with the patient's clinical picture?
+
+Provide your analysis in this format:
+
+### MANUAL CALCULATION REVIEW
+- Briefly summarize what the mathematical model calculated
+- State whether these numbers seem reasonable for this patient
+
+### YOUR INDEPENDENT ASSESSMENT
+- **Estimated Mortality Risk (PROM)**: X%
+- **Estimated Morbidity Risk (PROMM)**: X%
+- **Risk Category**: Low/Moderate/High
+- Brief clinical reasoning
+
+### COMPARISON & DISCREPANCY ANALYSIS
+- Compare your assessment with the manual calculation
+- If they differ significantly (>1%), explain the clinical reasons
+- Highlight any risk factors the mathematical model might have weighted differently
+
+### KEY RISK FACTORS & RECOMMENDATIONS
+- List major contributors to risk
+- Perioperative considerations
+- Clinical recommendations
+
+Be specific, analytical, and highlight any important differences between the mathematical model and clinical judgment.`;
+
+      const aiEst = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: aiPrompt }],
+        temperature: 0.3
+      });
+
+      const aiText = aiEst.choices[0].message.content;
+      
+      const report = `
+# STS RISK SCORE ANALYSIS
+## Comprehensive Three-Method Assessment
+
+---
+
+## 📋 TAB 1: PATIENT DATA (Complete Official STS Form)
+
+${stsForm}
+
+---
+
+## 🔢 TAB 2: MANUAL MATHEMATICAL CALCULATIONS
+
+**⚠️ NOTE:** This section uses **purely algorithmic calculations** based on published STS mathematical models. This is NOT AI-generated - it is deterministic mathematical computation using logistic regression coefficients.
+
+**Model Type:** ${structuredData.procedureType || 'General'} Risk Model  
+**Method:** Deterministic Logistic Regression with Published STS Coefficients  
+**Calculation Type:** Algorithmic (non-AI)
+
+---
+
+${mathTable}
+
+---SECTION---
+
+## 🤖 TAB 3: AI ANALYSIS WITH COMPARISON
+
+**⚠️ NOTE:** This section provides **AI-powered clinical analysis** that reviews and compares the mathematical calculations. The AI validates the numbers and provides clinical context.
+
+${aiText}
+
+---
+
+### Methodology Summary
+
+This analysis combines three approaches:
+1. **Patient Data Extraction** (AI + Human Review): Structured data from clinical notes
+2. **Manual Mathematical Calculation** (Algorithmic): Deterministic STS logistic regression models  
+3. **AI Clinical Analysis** (GPT-4o): Independent assessment and comparison with mathematical results
+
+This three-method approach ensures comprehensive risk stratification. Use alongside clinical judgment and patient preferences for shared decision-making.
+
+**Medical Disclaimer:** These estimates are computational tools for clinical decision support and do not replace physician judgment.
+
+---SECTION---`;
+
+      return res.json({ 
+        response: report,
+        structuredData: structuredData
+      });
+
+    } catch (err) {
+      console.error('Error in re-analysis:', err);
+      return res.status(500).json({ error: 'Failed to re-analyze with overrides', details: err.message });
+    }
+  }
+
+  // Original flow - initial analysis
   if (!mode || !data) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -161,9 +450,9 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Invalid mode' });
   }
 
-  const patientNotes = data.patientNotes || data.history || '';
+  const patientNotesInput = data.patientNotes || data.history || '';
   
-  if (!patientNotes) {
+  if (!patientNotesInput) {
     return res.status(400).json({ error: 'Patient notes required' });
   }
 
@@ -266,7 +555,7 @@ REQUIRED FIELDS (extract every one possible):
 }
 
 Patient Notes:
-${patientNotes}
+${patientNotesInput}
 
 Return ONLY the JSON object. Extract everything possible, use null for missing data, false for booleans.`;
 

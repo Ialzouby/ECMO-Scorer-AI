@@ -390,6 +390,14 @@
                     <h3 class="font-medium">AI Analysis Complete</h3>
                   </div>
                   <div id="ai-analysis-text" class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100"></div>
+                  
+                  <!-- Comprehensive Risk Report Button -->
+                  <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <button id="open-comprehensive-report" class="btn btn-primary w-full flex items-center justify-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                      View Comprehensive Preoperative Risk Assessment Report
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1405,6 +1413,9 @@ ${checkboxField('previousPCI', 'Previous PCI')}
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
           
+          // Attach comprehensive report button listener after content is loaded
+          setTimeout(() => attachComprehensiveReportListener(), 100);
+          
           // Display manual calculations tab - Tab 2 content with card layout
           document.getElementById('manual-calc-text').innerHTML = renderManualCalculationsWithCards(tab2Content);
           document.getElementById('manual-calc-empty').classList.add('hidden');
@@ -1492,10 +1503,25 @@ ${checkboxField('previousPCI', 'Previous PCI')}
           // Get the original patient notes
           const patientNotes = patientNotesTextarea ? patientNotesTextarea.value.trim() : '';
           
+          console.log('📝 Patient notes length:', patientNotes.length);
+          console.log('📊 Form data fields:', Object.keys(stsFormData).length);
+          console.log('🔍 Sample form data:', JSON.stringify(stsFormData).substring(0, 200));
+          
           if (!patientNotes) {
-            alert('Original patient notes not found. Please start over.');
+            alert('⚠️ Original patient notes not found. Please start over.');
+            saveButton.disabled = false;
+            saveButton.textContent = '💾 Save Changes & Re-analyze';
             return;
           }
+          
+          if (!stsFormData || Object.keys(stsFormData).length === 0) {
+            alert('⚠️ No form data to save. Please modify some fields first.');
+            saveButton.disabled = false;
+            saveButton.textContent = '💾 Save Changes & Re-analyze';
+            return;
+          }
+          
+          console.log('🚀 Sending re-analysis request...');
           
           // Send updated data to backend
           const response = await fetch('/api/sts-score', {
@@ -1535,6 +1561,9 @@ ${checkboxField('previousPCI', 'Previous PCI')}
           document.getElementById('ai-analysis-text').innerHTML = renderAIAnalysisWithCards(tab3Content);
           document.getElementById('ai-analysis-empty').classList.add('hidden');
           document.getElementById('ai-analysis-content').classList.remove('hidden');
+          
+          // Attach comprehensive report button listener after content is loaded
+          setTimeout(() => attachComprehensiveReportListener(), 100);
           
           // Update manual calculations tab - Tab 2 content with card layout
           document.getElementById('manual-calc-text').innerHTML = renderManualCalculationsWithCards(tab2Content);
@@ -1709,5 +1738,95 @@ if (toggleSurveyBtn) {
 }
 
   </script>
+
+<!-- Comprehensive Risk Assessment Modal -->
+<div id="comprehensive-report-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-gray-900 rounded-lg shadow-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden flex flex-col" style="width: 95%; height: 95vh;">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary-600 to-primary-700">
+      <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Comprehensive Preoperative Risk Assessment
+      </h2>
+      <button id="close-comprehensive-report" class="text-white hover:text-gray-200 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div id="comprehensive-report-content" class="flex-1 overflow-hidden bg-gray-100 dark:bg-gray-800">
+      <!-- PDF will be displayed here -->
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <button id="print-comprehensive-report" class="btn btn-outline btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+        Print Report
+      </button>
+      <button id="close-comprehensive-report-btn" class="btn btn-primary btn-sm">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Function to attach comprehensive report button listener
+  function attachComprehensiveReportListener() {
+    const openCompBtn = document.getElementById('open-comprehensive-report');
+    if (openCompBtn) {
+      console.log('✅ Comprehensive report button found, attaching listener');
+      openCompBtn.onclick = function() {
+        console.log('🔍 Opening PDF report...');
+        // Open the PDF in the modal with an iframe
+        const compModal = document.getElementById('comprehensive-report-modal');
+        const compContent = document.getElementById('comprehensive-report-content');
+        compContent.innerHTML = '<iframe src="Preoperative Risk Assessment and CABG Report.pdf.pdf" style="width: 100%; height: 100%; border: none; display: block;"></iframe>';
+        compModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      };
+    } else {
+      console.log('⚠️ Comprehensive report button not found yet');
+    }
+  }
+  
+  // Modal close and print functionality
+  const compModal = document.getElementById('comprehensive-report-modal');
+  const closeCompBtns = document.querySelectorAll('#close-comprehensive-report, #close-comprehensive-report-btn');
+  const printCompBtn = document.getElementById('print-comprehensive-report');
+  
+  // Close modal
+  closeCompBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      compModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+  });
+  
+  // Close on background click
+  compModal.addEventListener('click', (e) => {
+    if (e.target === compModal) {
+      compModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  });
+  
+  // Print functionality - open PDF in new window for printing
+  if (printCompBtn) {
+    printCompBtn.addEventListener('click', () => {
+      window.open('Preoperative Risk Assessment and CABG Report.pdf.pdf', '_blank');
+    });
+  }
+  
+  // Keyboard shortcut (Escape to close)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !compModal.classList.contains('hidden')) {
+      compModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  });
+</script>
+
 </body>
 </html>
